@@ -1,0 +1,75 @@
+﻿<Window x:Class="ezFFmpeg.Views.AboutDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="バージョン情報"
+        Width="360"
+        Height="300"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ===================== -->
+        <!-- ヘッダー（アイコン＋タイトル） -->
+        <!-- ===================== -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- アプリアイコン -->
+            <Image Source="pack://application:,,,/Resources/Images/appIcon.ico"
+                   Width="48"
+                   Height="48"
+                   Margin="0,0,12,0"
+                   VerticalAlignment="Top"/>
+
+            <!-- アプリ名 + バージョン -->
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="{Binding AppName}"
+                           FontSize="18"
+                           FontWeight="Bold"/>
+                <TextBlock Text="{Binding Version}"
+                           Foreground="Gray"
+                           Margin="0,4,0,0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- ===================== -->
+        <!-- 内容 -->
+        <!-- ===================== -->
+        <StackPanel Grid.Row="1" Margin="0,12,0,0">
+            <TextBlock Text="{Binding Description}" />
+            <TextBlock Text="{Binding Copyright}"
+                       Margin="0,12,0,0"
+                       Foreground="Gray"/>
+            <TextBlock Text="{Binding LibraryInfo}"
+                       Margin="0,6,0,0"
+                       Foreground="Gray"/>
+        </StackPanel>
+        <TextBox Grid.Row="2"
+                 Text="{Binding VersionInfo}"
+                 Margin="0,6,0,8"
+                 IsReadOnly="True"
+                 TextWrapping="Wrap"
+                 VerticalScrollBarVisibility="Auto"/>
+        
+        <!-- ===================== -->
+        <!-- OK ボタン -->
+        <!-- ===================== -->
+        <Button Grid.Row="3"
+                Content="OK"
+                Width="80"
+                Height="26"
+                HorizontalAlignment="Right"
+                IsDefault="True"
+                Command="{Binding CloseCommand}"/>
+    </Grid>
+</Window>
