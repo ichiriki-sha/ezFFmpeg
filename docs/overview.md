@@ -152,5 +152,5 @@ ezFFmpeg は以下を目的としません。
   → 全体構成・責務分離の詳細
 - [ffmpeg_options.md](ffmpeg_options.md)  
   → オプション設計方針
-- [profile.md](profile.md)  
+- [profiles.md](profiles.md)  
   → プロファイル仕様
