@@ -102,7 +102,7 @@ ezFFmpeg/
 - [Architecture](docs/architecture.md)  
   内部構造・責務分離・設計方針
 
-- [FFmpeg Options](docs/ffmpeg-options.md)  
+- [FFmpeg Options](docs/ffmpeg_options.md)  
   FFmpeg オプション設計と引数生成ルール
 
 - [Profiles](docs/profiles.md)  
