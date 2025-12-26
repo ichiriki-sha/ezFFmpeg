@@ -7,9 +7,12 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/Dotnet.gitignore
 
+<<<<<<< HEAD
 # Visual Studio
 .vs/
 
+=======
+>>>>>>> 401e3e0 (初回コミット: ezFFmpegプロジェクト作成)
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

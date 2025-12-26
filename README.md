@@ -98,16 +98,16 @@ ezFFmpeg/
 - [Overview](docs/overview.md)  
   プロジェクト全体の概要と目的
 
-- [Architecture](docs/architecture.md)  
+- [Architecture](docs/architecture.md)
   内部構造・責務分離・設計方針
 
-- [FFmpeg Options](docs/ffmpeg_options.md)  
+- [FFmpeg Options](docs/ffmpeg_options.md)
   FFmpeg オプション設計と引数生成ルール
 
-- [Profiles](docs/profiles.md)  
+- [Profiles](docs/profiles.md)
   エンコード設定（Profile）の考え方と管理方法
 
-- [FAQ](docs/faq.md)  
+- [FAQ](docs/faq.md)
   よくある質問とトラブルシューティング
 
 =======
