@@ -165,9 +165,7 @@ FFmpeg コマンド文字列を
 
 ### 主なクラス
 
-- `VideoArgumentBuilder`
-- `AudioArgumentBuilder`
-- `QualityArgumentBuilder`
+- `FFmpegArgumentBuilder`
 - `FFprobeArgumentBuilder`
 
 ### 特徴
