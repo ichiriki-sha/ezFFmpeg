@@ -1,5 +1,4 @@
 # ezFFmpeg
-<<<<<<< HEAD
 
 ezFFmpeg は、FFmpeg を **簡単・安全に扱うための GUI ツール**です。  
 複雑な FFmpeg コマンドを直接書かずに、エンコード設定・プロファイル管理・GPU 利用などを行えます。
