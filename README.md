@@ -109,5 +109,7 @@ ezFFmpeg/
 
 - [FAQ](docs/faq.md)  
   よくある質問とトラブルシューティング
+
 =======
+
 ezFFmpeg は、FFmpeg を 簡単・安全に扱うための GUI ツールです。
