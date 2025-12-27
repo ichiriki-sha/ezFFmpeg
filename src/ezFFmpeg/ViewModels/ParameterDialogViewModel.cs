@@ -17,7 +17,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
-using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 
 namespace ezFFmpeg.ViewModels
 {
@@ -140,19 +139,18 @@ namespace ezFFmpeg.ViewModels
                 {
 
                     var format = OutputFormats.GetOutputFormat(_outputFormat);
+
                     // ビデオ
-                    string defaultVideoEncoder ="";
                     ComboBoxHelper.SetVideoEncoders(VideoEncoderList,
-                                                    out defaultVideoEncoder,
+                                                    out string defaultVideoEncoder,
                                                     VideoEncoders.All,
                                                     format,
                                                     _settings.UseGpu);
                     VideoEncoder = defaultVideoEncoder;
 
                     // オーディオ
-                    string defaultAudioEncoder = "";
                     ComboBoxHelper.SetAudioEncoders(AudioEncoderList,
-                                                    out defaultAudioEncoder,
+                                                    out string defaultAudioEncoder,
                                                     AudioEncoders.All,
                                                     format);
                     AudioEncoder = defaultAudioEncoder;
@@ -364,29 +362,8 @@ namespace ezFFmpeg.ViewModels
             ComboBoxHelper.SetFromOutputFileTags(OutputFileTagList, OutputFileTags.All);
 
             // ビデオ
-            //ComboBoxHelper.SetFromEncoders(
-            //                        VideoEncoderList,
-            //                        VideoEncoders.All,
-            //                        e => e.CanUse &&
-            //                                (_settings.UseGpu
-            //                                    ? (e.Type == EncoderType.Cpu || e.Type == EncoderType.Gpu)
-            //                                    : (e.Type == EncoderType.Cpu)),
-            //                        e => e.Encoder,
-            //                        e => e.Name
-            //                    );
-            //ComboBoxHelper.SetFromVideoEncoders(
-            //                VideoEncoderList,
-            //                VideoEncoders.All,
-            //                _settings.CurrentProfile.OutputFormat,                            // 選択中の OutputFormat
-            //                e => e.Codec,                 // Encoder → VideoCodec を返す
-            //                e => e.CanUse && (_settings.UseGpu ? (e.Type == EncoderType.Cpu || e.Type == EncoderType.Gpu) : e.Type == EncoderType.Cpu),
-            //                e => e.Encoder,
-            //                e => e.Name
-            //);
-            string defaultEncoder = "";
-
             ComboBoxHelper.SetVideoEncoders(VideoEncoderList,
-                                            out defaultEncoder,
+                                            out string defaultEncoder,
                                             VideoEncoders.All,
                                             format,
                                             _settings.UseGpu);
@@ -397,10 +374,6 @@ namespace ezFFmpeg.ViewModels
             ComboBoxHelper.SetFromCollection(VideoFrameRateList, VideoFrameRates.All, x => x.FrameRate, x => x.Name);
 
             // オーディオ
-            //ComboBoxHelper.SetFromEncoders(AudioEncoderList, AudioEncoders.All,
-            //                        e => e.CanUse,
-            //                        e => e.Encoder,
-            //                        e => e.Name);
             ComboBoxHelper.SetAudioEncoders(AudioEncoderList,
                                             out defaultEncoder,
                                             AudioEncoders.All,
@@ -417,7 +390,7 @@ namespace ezFFmpeg.ViewModels
 
 
             // コマンドの設定
-            BrowseOutputCommand = new RelayCommand(ShowFolderDialog);
+            BrowseOutputCommand     = new RelayCommand(ShowFolderDialog);
             ApplyCommand            = new RelayCommand(Apply);
             CancelCommand           = new RelayCommand(Cancel);
             InsertTagCommand        = new RelayCommand<SelectionItem>(InsertTagItem);
@@ -475,79 +448,6 @@ namespace ezFFmpeg.ViewModels
                     throw new ArgumentOutOfRangeException(nameof(mode));
             }
         }
-
-        ///// <summary>
-        ///// 指定された Profile の内容を ViewModel に反映する。
-        ///// </summary>
-        ///// <param name="source">コピー元 Profile</param>
-        ///// <param name="includeId">
-        ///// true の場合は ProfileId もコピーする。
-        ///// </param>
-        //private void CopyFrom(Profile source, bool includeId)
-        //{
-        //    if (includeId)
-        //    {
-        //        ProfileId = source.ProfileId;
-        //    }
-
-        //    ProfileName = source.ProfileName;
-
-        //    OutputFormat = source.OutputFormat;
-        //    OutputFolderPath = source.OutputFolderPath;
-        //    OutputFileFormat = source.OutputFileFormat;
-        //    IsOutputOverwrite = source.IsOutputOverwrite;
-            
-        //    IsVideoEnabled = source.IsVideoEnabled;
-        //    VideoEncoder = source.VideoEncoder;
-        //    VideoQualityTier = source.VideoQualityTier;
-        //    VideoResolution = source.VideoResolution;
-        //    VideoFrameRateMode = source.VideoFrameRateMode;
-        //    VideoFrameRate = source.VideoFrameRate;
-            
-        //    IsAudioEnabled = source.IsAudioEnabled;
-        //    AudioEncoder = source.AudioEncoder;
-        //    AudioBitRate = source.AudioBitRate;
-        //    IsUserDefined = source.IsUserDefined;
-        //    IsDefault = source.IsDefault;
-        //    IsLastUsed = source.IsLastUsed;
-        //}
-
-        ///// <summary>
-        ///// 現在の ViewModel の内容を Profile へコピーする。
-        ///// ダイアログ結果生成時に使用される。
-        ///// </summary>
-        ///// <param name="target">コピー先の Profile</param>
-        ///// <param name="includeId">
-        ///// true の場合は ProfileId もコピーする。
-        ///// false の場合は ProfileId をコピーしない（新規作成用）。
-        ///// </param>
-        //private void CopyTo(Profile target, bool includeId)
-        //{
-        //    if (includeId)
-        //    {
-        //        target.ProfileId = this.ProfileId;
-        //    }
-
-        //    target.ProfileName = this.ProfileName;
-        //    target.OutputFormat = this.OutputFormat;
-        //    target.OutputFolderPath = this.OutputFolderPath;
-        //    target.OutputFileFormat = this.OutputFileFormat;
-        //    target.IsOutputOverwrite = this.IsOutputOverwrite;
-
-        //    target.IsVideoEnabled = this.IsVideoEnabled;
-        //    target.VideoEncoder = this.VideoEncoder;
-        //    target.VideoQualityTier = this.VideoQualityTier;
-        //    target.VideoResolution = this.VideoResolution;
-        //    target.VideoFrameRateMode = this.VideoFrameRateMode;
-        //    target.VideoFrameRate = this.VideoFrameRate;
-            
-        //    target.IsAudioEnabled = this.IsAudioEnabled;
-        //    target.AudioEncoder = this.AudioEncoder;
-        //    target.AudioBitRate = this.AudioBitRate;
-        //    target.IsUserDefined = this.IsUserDefined;
-        //    target.IsDefault = this.IsDefault;
-        //    target.IsLastUsed = this.IsLastUsed;
-        //}
 
         /// <summary>
         /// 選択されたプロファイルの値を画面に反映
@@ -666,11 +566,15 @@ namespace ezFFmpeg.ViewModels
                 if (VideoFrameRateMode == VideoFrameRateModes.Source.FrameRateMode ||
                     VideoFrameRateMode == VideoFrameRateModes.Passthrough.FrameRateMode)
                 {
-                    // fps 指定は不要
+                    if (VideoFrameRate != VideoFrameRates.Source.FrameRate) // ユーザーが指定した場合
+                    {
+                        return ValidationResult.Warning("Source / Passthrough の場合、フレームレート指定は無視されます。");
+                    }
                 }
                 else if (VideoFrameRateMode == VideoFrameRateModes.CFR.FrameRateMode)
                 {
-                    return ValidationResult.Error("CFR の場合はフレームレートを指定してください。");
+                    if (VideoFrameRate == VideoFrameRates.Source.FrameRate)
+                        return ValidationResult.Error("CFR の場合はフレームレートを指定してください。");
                 }
                 else if (VideoFrameRateMode == VideoFrameRateModes.VFR.FrameRateMode)
                 {
@@ -705,7 +609,7 @@ namespace ezFFmpeg.ViewModels
             //    return ValidationResult.Error($"出力形式({outputFormatName})を出力には『ビデオを出力する』に\nチェックをしてください。");
             //}
 
-            return ValidationResult.Success;
+            return ValidationResult.Success();
         }
 
         /// <summary>
@@ -719,6 +623,7 @@ namespace ezFFmpeg.ViewModels
         {
             var result = Validate();
 
+
             // 検証結果が無効（エラーあり）の場合
             if (!result.IsValid)
             {
@@ -731,6 +636,20 @@ namespace ezFFmpeg.ViewModels
 
                 // 入力が不正なため false を返す
                 return false;
+            }
+
+            if (result.IsWarning)
+            {
+                // 警告メッセージ
+                var warningResult = _dialogService.ShowMessageBox(
+                    result.Message!,
+                    "警告",
+                    MessageBoxButton.OKCancel,  // OK: 続行、Cancel: 中止
+                    MessageBoxImage.Warning);
+
+                // Cancel を選択した場合は false を返す
+                if (warningResult ==  MessageBoxResult.Cancel)
+                    return false;
             }
 
             // すべての入力が正しい場合

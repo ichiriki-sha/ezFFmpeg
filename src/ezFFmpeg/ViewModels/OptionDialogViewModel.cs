@@ -147,8 +147,8 @@ namespace ezFFmpeg.ViewModels
         /// </summary>
         public OptionDialogViewModel(AppSettings settings, IDialogService dialogService)
         {
-            _settings = settings;
-            _dialogService = dialogService;
+            _settings                   = settings;
+            _dialogService              = dialogService;
 
 
             _isDefualtProfileEnabled    = false;
@@ -182,7 +182,7 @@ namespace ezFFmpeg.ViewModels
             profile.IsUserDefined       = true;
             AddProfileCommand           = new RelayCommand(
                                                 () => ShowParameterDialog(ParameterDialogMode.ProfileAdd, profile));
-            CopyProfileCommand　　　   = new RelayCommand(
+            CopyProfileCommand　　　    = new RelayCommand(
                                                 () => ShowParameterDialog(ParameterDialogMode.ProfileAdd, SelectedProfile!.Clone(false)));
             EditProfileCommand          = new RelayCommand(
                                                 () => ShowParameterDialog(ParameterDialogMode.ProfileEdit, SelectedProfile!));
@@ -289,7 +289,7 @@ namespace ezFFmpeg.ViewModels
             if (!ConversionParallelLimits.IsValid(ParallelCount))
                 return ValidationResult.Error("並列数が不正です。");
 
-            return ValidationResult.Success;
+            return ValidationResult.Success();
         }
 
         /// <summary>
