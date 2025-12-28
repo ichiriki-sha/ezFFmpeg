@@ -589,9 +589,11 @@ namespace ezFFmpeg.ViewModels
             IsReadOnly = true;
             UpdateToolboxButtonsState();
 
-            // ログ初期化
+            // アイテム初期化
             foreach (var item in selectedFiles)
             {
+                item.Progress = 0;
+                item.Status = ProcessingStatus.Pending ;
                 item.ProcessingLogLines.Clear();
             }
 
