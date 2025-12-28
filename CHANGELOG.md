@@ -19,6 +19,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - パラメータ画面の入力チェックを強化
 
+## [0.9.1] - 2026-12-27
+
+### Update
+
+- パラメータの組み合わせでエラーになる不具合を修正
+
 ## [0.9.0] - 2026-12-26
 
 ### Added
