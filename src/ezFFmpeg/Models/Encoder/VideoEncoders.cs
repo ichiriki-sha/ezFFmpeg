@@ -4,7 +4,7 @@ using ezFFmpeg.Models.Common;
 using ezFFmpeg.Models.Interfaces;
 using ezFFmpeg.Models.Media;
 using ezFFmpeg.Models.Quality;
-using ezFFmpeg.Services.FFmpeg;
+using ezFFmpeg.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

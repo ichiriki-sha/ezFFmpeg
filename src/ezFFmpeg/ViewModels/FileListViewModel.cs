@@ -1,7 +1,7 @@
 ﻿using ezFFmpeg.Common;
 using ezFFmpeg.Models.Common;
 using ezFFmpeg.Models.Media;
-using ezFFmpeg.Services.FFmpeg;
+using ezFFmpeg.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.Windows;
 

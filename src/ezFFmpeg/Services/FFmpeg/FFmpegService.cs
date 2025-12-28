@@ -1,5 +1,6 @@
 ﻿using ezFFmpeg.Models.Common;
 using ezFFmpeg.Services.FFmpeg.EncoderCapabilityProvider;
+using ezFFmpeg.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

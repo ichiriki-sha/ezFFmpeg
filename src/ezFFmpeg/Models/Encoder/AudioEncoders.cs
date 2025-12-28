@@ -1,7 +1,7 @@
 ﻿using ezFFmpeg.Models.Codec;
 using ezFFmpeg.Models.Common;
 using ezFFmpeg.Models.Interfaces;
-using ezFFmpeg.Services.FFmpeg;
+using ezFFmpeg.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;

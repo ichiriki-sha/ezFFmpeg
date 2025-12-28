@@ -545,12 +545,14 @@ namespace ezFFmpeg.ViewModels
                 return ValidationResult.Error("出力ファイル名を入力してください。");
             }
 
+            var format = OutputFormats.GetOutputFormat(OutputFormat);
+
             // ===== ビデオ =====
             if (IsVideoEnabled)
             {
                 if (string.IsNullOrWhiteSpace(VideoEncoder))
                 {
-                    return ValidationResult.Error("ビデオコーデックを選択してください。");
+                    return ValidationResult.Error("ビデオエンコーダーを選択してください。");
                 }
 
                 if (string.IsNullOrWhiteSpace(VideoResolution))
@@ -568,7 +570,7 @@ namespace ezFFmpeg.ViewModels
                 {
                     if (VideoFrameRate != VideoFrameRates.Source.FrameRate) // ユーザーが指定した場合
                     {
-                        return ValidationResult.Warning("Source / Passthrough の場合、フレームレート指定は無視されます。");
+                        return ValidationResult.Warning("変更しない / パススルー の場合、フレームレート指定は無視されます。");
                     }
                 }
                 else if (VideoFrameRateMode == VideoFrameRateModes.CFR.FrameRateMode)
@@ -591,12 +593,21 @@ namespace ezFFmpeg.ViewModels
             {
                 if (string.IsNullOrWhiteSpace(AudioEncoder))
                 {
-                    return ValidationResult.Error("オーディオコーデックを選択してください。");
+                    return ValidationResult.Error("オーディオエンコーダーを選択してください。");
                 }
 
                 if (string.IsNullOrWhiteSpace(AudioBitRate))
                 {
                     return ValidationResult.Error("オーディオビットレートを選択してください。");
+                }
+
+                if(format.MediaType == MediaType.Audio)
+                {
+
+                    if(AudioEncoder == AudioEncoders.Copy.Encoder)
+                    {
+                        return ValidationResult.Warning("選択した出力形式と動画のオーディオコーディックが一致しなかった場合、変換時にエラーになる可能性があります。");
+                    }
                 }
             }
 

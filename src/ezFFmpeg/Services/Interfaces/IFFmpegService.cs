@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ezFFmpeg.Services.FFmpeg
+namespace ezFFmpeg.Services.Interfaces
 {
     /// <summary>
     /// FFmpeg および FFprobe の操作を抽象化するインターフェイス。

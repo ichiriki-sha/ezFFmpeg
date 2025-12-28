@@ -1,6 +1,7 @@
 ﻿using ezFFmpeg.Common;
 using ezFFmpeg.Models.Common;
 using ezFFmpeg.Services.FFmpeg;
+using ezFFmpeg.Services.Interfaces;
 using System;
 using System.Globalization;
 using System.IO;
