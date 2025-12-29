@@ -27,7 +27,7 @@ namespace ezFFmpeg.Helpers
         /// </summary>
         /// <param name="bps">ビットレート (bps)</param>
         /// <returns>例: 128000 → "128 kbps", 5000000 → "5.00 Mbps"</returns>
-        public static string ToBitrateString(this long bps)
+        public static string ToBitRateString(this long bps)
         {
             if (bps <= 0)
                 return "0 kbps";

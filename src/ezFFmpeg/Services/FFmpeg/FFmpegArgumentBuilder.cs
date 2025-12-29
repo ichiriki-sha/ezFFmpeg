@@ -44,21 +44,26 @@ namespace ezFFmpeg.Services.FFmpeg
         /// </summary>
         private static void AppendFrameRateOptions(StringBuilder sb, Profile profile)
         {
-            if (profile.VideoFrameRateMode == VideoFrameRateModes.Source.FrameRateMode)
+            if(!string.IsNullOrWhiteSpace(profile.VideoFrameRateMode))
             {
-                // 変更しない場合は何もしない
-            }
-            else if (profile.VideoFrameRateMode == VideoFrameRateModes.CFR.FrameRateMode)
-            {
-                if (!string.IsNullOrEmpty(profile.VideoFrameRate))
+                var FrameRateMode = VideoFrameRateModes.GetFrameRateMode(profile.VideoFrameRateMode);
+
+                if (FrameRateMode.IsPassthrough)
                 {
-                    sb.Append($"-r {profile.VideoFrameRate} ");
+                    // 変更しない場合は何もしない
                 }
-                sb.Append("-vsync cfr ");
-            }
-            else if (profile.VideoFrameRateMode == VideoFrameRateModes.CFR.FrameRateMode)
-            {
-                sb.Append("-vsync vfr ");
+                else if (FrameRateMode.IsCfr)
+                {
+                    if (!string.IsNullOrEmpty(profile.VideoFrameRate))
+                    {
+                        sb.Append($"-r {profile.VideoFrameRate} ");
+                    }
+                    sb.Append("-vsync cfr ");
+                }
+                else if (FrameRateMode.IsVfr)
+                {
+                    sb.Append("-vsync vfr ");
+                }
             }
         }
 
@@ -119,27 +124,30 @@ namespace ezFFmpeg.Services.FFmpeg
                 }
 
                 // 解像度制御
-                if (!string.IsNullOrEmpty(profile.VideoResolution)
-                    && profile.VideoResolution != VideoResolutions.Source.Resolution)
+                if (!string.IsNullOrEmpty(profile.VideoResolution))
                 {
-                    var srcSize = item.VideoResolutionSize;
-                    var trgSize = VideoResolutions.GetSize(profile.VideoResolution);
-
-                    var srcAspect = GetAspectRatio(srcSize.Width, srcSize.Height);
-                    var trgAspect = GetAspectRatio(trgSize.Width, trgSize.Height);
-
-                    if (srcAspect.Width == trgAspect.Width && srcAspect.Height == trgAspect.Height)
+                    var resolution = VideoResolutions.GetResolution(profile.VideoResolution);
+                    if(!resolution.IsSource)
                     {
-                        // アスペクト比が同じ
-                        sb.Append($"-s {trgSize.Width}x{trgSize.Height} ");
-                    }
-                    else
-                    {
-                        // アスペクト比が異なる場合
-                        if (item.VideoResolutionSize.Width > item.VideoResolutionSize.Height)
-                            sb.Append($"-vf scale={trgSize.Width}:-2,setsar=1 ");
+                        var srcSize = item.VideoResolutionSize;
+                        var trgSize = resolution.Size;
+
+                        var srcAspect = GetAspectRatio(srcSize.Width, srcSize.Height);
+                        var trgAspect = GetAspectRatio(trgSize.Width, trgSize.Height);
+
+                        if (srcAspect.Width == trgAspect.Width && srcAspect.Height == trgAspect.Height)
+                        {
+                            // アスペクト比が同じ
+                            sb.Append($"-s {trgSize.Width}x{trgSize.Height} ");
+                        }
                         else
-                            sb.Append($"-vf scale=-2:{trgSize.Width},setsar=1 ");
+                        {
+                            // アスペクト比が異なる場合
+                            if (item.VideoResolutionSize.Width > item.VideoResolutionSize.Height)
+                                sb.Append($"-vf scale={trgSize.Width}:-2,setsar=1 ");
+                            else
+                                sb.Append($"-vf scale=-2:{trgSize.Width},setsar=1 ");
+                        }
                     }
                 }
 
@@ -163,10 +171,11 @@ namespace ezFFmpeg.Services.FFmpeg
                 }
 
                 var audioEncoder = AudioEncoders.GetEncoder(profile.AudioEncoder);
+                var BitRate = AudioBitRates.GetBitRate(profile.AudioBitRate);
 
                 if (!string.IsNullOrEmpty(profile.AudioBitRate) &&
                     !audioEncoder.IsCopy  &&
-                    profile.AudioBitRate != AudioBitrates.Source.BitRate)
+                    !BitRate.IsSource)
                 {
                     sb.Append($"-b:a {profile.AudioBitRate} ");
                 }

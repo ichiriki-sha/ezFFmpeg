@@ -195,19 +195,19 @@ namespace ezFFmpeg.Models.Common
             _profileName = "既定(H.264 / MP4)";
             _outputFormat = OutputFormats.Mp4.Extension;
             _outputFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
-            _outputFileFormat = $"{{{OutputFileTags.FileName.Tag}}}_{{{OutputFileTags.VideoCodec.Tag}}}{{{OutputFileTags.Extension.Tag}}}";
+            _outputFileFormat = $"{{{OutputFileTags.FileName.Tag}}}_{{{OutputFileTags.VideoCodec.Tag}}}{{{OutputFileTags.AudioCodec.Tag}}}";
             _isOutputOverwrite = true;
 
             _isVideoEnabled = true;
             _videoEncoder = VideoEncoders.LibX264.Encoder;
             _videoQualityTier = QualityTier.Medium;
             _videoResolution = VideoResolutions.Source.Resolution;
-            _videoFrameRateMode = VideoFrameRateModes.Source.FrameRateMode;
+            _videoFrameRateMode = VideoFrameRateModes.Passthrough.FrameRateMode;
             _videoFrameRate = VideoFrameRates.Source.FrameRate;
 
             _isAudioEnabled = true;
             _audioEncoder = AudioEncoders.Copy.Encoder;
-            _audioBitRate = AudioBitrates.Source.BitRate;
+            _audioBitRate = AudioBitRates.Source.BitRate;
 
             _isUserDefined = false;
             _isDefault = false;

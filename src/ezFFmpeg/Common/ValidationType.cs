@@ -3,7 +3,7 @@
     /// <summary>
     /// バリデーション結果の種類を表す列挙型。
     /// </summary>
-    public enum ValidationType
+    internal enum ValidationType
     {
         /// <summary>
         /// 成功（処理には影響なし）

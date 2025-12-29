@@ -54,7 +54,7 @@ namespace ezFFmpeg.Models.Media
         /// ビットレートを文字列として取得。
         /// 例: 500000 → "500 kbps"
         /// </summary>
-        public string BitRateString => BitRate.ToBitrateString();
+        public string BitRateString => BitRate.ToBitRateString();
 
         /// <summary>
         /// フレームレートを文字列として取得。

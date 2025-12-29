@@ -9,14 +9,15 @@
     <ApplicationIcon>Resources\images\AppIcon.ico</ApplicationIcon>
     <StartupObject>ezFFmpeg.App</StartupObject>
     <Copyright>ichiriki-sha</Copyright>
-    <AssemblyVersion>0.9.2.0</AssemblyVersion>
-    <FileVersion>0.9.2.0</FileVersion>
+    <AssemblyVersion>0.9.3.0</AssemblyVersion>
+    <FileVersion>0.9.3.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Common\AppConstants.cs" />
     <Compile Remove="Common\AppSettingsBase.cs" />
     <Compile Remove="Converters\NullToIsEnabledConverter .cs" />
+    <Compile Remove="Helpers\ImageHelper.cs" />
     <Compile Remove="Models\Codec.cs" />
     <Compile Remove="Models\CrfQuality.cs" />
     <Compile Remove="Models\IQualityLevel.cs" />

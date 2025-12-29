@@ -93,6 +93,15 @@ namespace ezFFmpeg
             // メインウィンドウを作成・表示
             var mainWindow = new MainWindow(setting);
             mainWindow.Show();
+
+            // 作業フォルダのクリーンアップ
+            foreach (var file in Directory.GetFiles(setting.WorkFolderPath))
+            {
+                try
+                {
+                    File.Delete(file);
+                } catch   { /* 無視 */ }
+            }
         }
     }
 }

@@ -130,41 +130,5 @@ namespace ezFFmpeg.Models.Output
             if (format == null) throw new ArgumentException($"未対応の extension: {extension}");
             return format.MediaType;
         }
-
-        /// <summary>
-        /// 出力ファイル名をプロファイルとテンプレートに基づき生成する。
-        /// </summary>
-        /// <param name="fileName">元の入力ファイル名</param>
-        /// <param name="settings">アプリケーション設定および現在のプロファイル情報</param>
-        /// <returns>生成された出力ファイル名</returns>
-        public static string GenerateOutputFileName(string fileName, AppSettings settings)
-        {
-            // タグに対応する値を設定
-            var tags = new Dictionary<string, string>
-            {
-                [OutputFileTags.FileName.Tag] = Path.GetFileNameWithoutExtension(fileName),
-                [OutputFileTags.VideoCodec.Tag] = VideoEncoders.GetCodec(settings.CurrentProfile.VideoEncoder).Name.Replace(".", ""),
-                [OutputFileTags.AudioCodec.Tag] = AudioEncoders.GetCodec(settings.CurrentProfile.AudioEncoder).Name.Replace(".", ""),
-                [OutputFileTags.VideoResolution.Tag] = settings.CurrentProfile.VideoResolution,
-                [OutputFileTags.VideoQuality.Tag] = settings.CurrentProfile.VideoQualityTier.ToString(),
-                [OutputFileTags.Extension.Tag] = settings.CurrentProfile.OutputFormat,
-                [OutputFileTags.TimeStamp.Tag] = settings.ProcessStartTime.ToString("yyyyMMddHHmmss")
-            };
-
-            string ret = settings.CurrentProfile.OutputFileFormat;
-
-            // タグをテンプレート内に置換
-            foreach (var tag in tags)
-            {
-                string pattern = $@"\{{{Regex.Escape(tag.Key)}\}}";
-                ret = Regex.Replace(
-                    ret,
-                    pattern,
-                    tag.Value,
-                    RegexOptions.IgnoreCase
-                );
-            }
-            return ret;
-        }
     }
 }

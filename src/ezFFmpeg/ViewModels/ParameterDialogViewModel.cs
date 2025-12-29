@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 
@@ -379,7 +380,7 @@ namespace ezFFmpeg.ViewModels
                                             AudioEncoders.All,
                                             format);
 
-            ComboBoxHelper.SetFromCollection(AudioBitRateList, AudioBitrates.All, x => x.BitRate, x => x.Name);
+            ComboBoxHelper.SetFromCollection(AudioBitRateList, AudioBitRates.All, x => x.BitRate, x => x.Name);
 
             // 初期値の設定
             SetModeDefaults(mode);
@@ -531,19 +532,16 @@ namespace ezFFmpeg.ViewModels
             // ===== 共通チェック =====
 
             if (string.IsNullOrWhiteSpace(OutputFormat))
-            {
                 return ValidationResult.Error("出力形式を選択してください。");
-            }
 
             if (string.IsNullOrWhiteSpace(OutputFolderPath))
-            {
                 return ValidationResult.Error("出力フォルダを選択してください。");
-            }
+
+            if (!Directory.Exists(OutputFolderPath))
+                return ValidationResult.Error("出力フォルダが見つかりません。");
 
             if (string.IsNullOrWhiteSpace(OutputFileFormat))
-            {
                 return ValidationResult.Error("出力ファイル名を入力してください。");
-            }
 
             var format = OutputFormats.GetOutputFormat(OutputFormat);
 
@@ -551,34 +549,28 @@ namespace ezFFmpeg.ViewModels
             if (IsVideoEnabled)
             {
                 if (string.IsNullOrWhiteSpace(VideoEncoder))
-                {
                     return ValidationResult.Error("ビデオエンコーダーを選択してください。");
-                }
 
                 if (string.IsNullOrWhiteSpace(VideoResolution))
-                {
                     return ValidationResult.Error("解像度を選択してください。");
-                }
 
                 if (string.IsNullOrWhiteSpace(VideoFrameRateMode))
-                {
                     return ValidationResult.Error("フレームレート制御方式を選択してください。");
-                }
 
-                if (VideoFrameRateMode == VideoFrameRateModes.Source.FrameRateMode ||
-                    VideoFrameRateMode == VideoFrameRateModes.Passthrough.FrameRateMode)
+                var videoFrameRateMode = VideoFrameRateModes.GetFrameRateMode(VideoFrameRateMode);
+                var videoFrameRate = VideoFrameRates.GetFrameRate(VideoFrameRate);
+
+                if (videoFrameRateMode.IsSource || videoFrameRateMode.IsPassthrough)
                 {
-                    if (VideoFrameRate != VideoFrameRates.Source.FrameRate) // ユーザーが指定した場合
-                    {
-                        return ValidationResult.Warning("変更しない / パススルー の場合、フレームレート指定は無視されます。");
-                    }
+                    if (!videoFrameRate.IsSource) // ユーザーが指定した場合
+                        return ValidationResult.Warning("変更しない場合、フレームレート指定は無視されます。");
                 }
-                else if (VideoFrameRateMode == VideoFrameRateModes.CFR.FrameRateMode)
+                else if (videoFrameRateMode.IsCfr)
                 {
-                    if (VideoFrameRate == VideoFrameRates.Source.FrameRate)
+                    if (videoFrameRate.IsSource)
                         return ValidationResult.Error("CFR の場合はフレームレートを指定してください。");
                 }
-                else if (VideoFrameRateMode == VideoFrameRateModes.VFR.FrameRateMode)
+                else if (videoFrameRateMode.IsVfr)
                 {
                 }
                 else
@@ -592,22 +584,15 @@ namespace ezFFmpeg.ViewModels
             if (IsAudioEnabled)
             {
                 if (string.IsNullOrWhiteSpace(AudioEncoder))
-                {
                     return ValidationResult.Error("オーディオエンコーダーを選択してください。");
-                }
 
                 if (string.IsNullOrWhiteSpace(AudioBitRate))
-                {
                     return ValidationResult.Error("オーディオビットレートを選択してください。");
-                }
 
                 if(format.MediaType == MediaType.Audio)
                 {
-
                     if(AudioEncoder == AudioEncoders.Copy.Encoder)
-                    {
                         return ValidationResult.Warning("選択した出力形式と動画のオーディオコーディックが一致しなかった場合、変換時にエラーになる可能性があります。");
-                    }
                 }
             }
 

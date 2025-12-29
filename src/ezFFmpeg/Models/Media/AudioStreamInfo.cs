@@ -42,7 +42,7 @@ namespace ezFFmpeg.Models.Media
         /// ビットレートを文字列として取得。
         /// 例: 128000 → "128 kbps"
         /// </summary>
-        public string BitRateString => BitRate.ToBitrateString();
+        public string BitRateString => BitRate.ToBitRateString();
 
         /// <summary>
         /// チャンネル数を文字列として取得。

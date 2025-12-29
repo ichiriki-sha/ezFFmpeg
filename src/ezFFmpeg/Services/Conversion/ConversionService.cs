@@ -123,7 +123,7 @@ namespace ezFFmpeg.Services.Conversion
 
             // 出力ファイル名を設定に基づいて生成
             var outputFileName =
-                OutputFileNameGenerator.Generate(file.FilePath, settings);
+                OutputFileNameGenerator.Generate(file, settings);
 
             // 出力先フルパスを構築
             var outputPath = Path.Combine(
@@ -172,8 +172,8 @@ namespace ezFFmpeg.Services.Conversion
                         ? ProcessingStatus.Completed
                         : ProcessingStatus.Error;
 
-                    file.IsChecked = false;
-                    file.Progress = 100;
+                    file.IsChecked = file.Status != ProcessingStatus.Completed;
+                    file.Progress = file.Status == ProcessingStatus.Completed ? 100 : 0;
                     file.ProcessingLogLines.Add(
                         $"[Completed] {DateTime.Now:yyyy-MM-dd HH:mm:ss} ExitCode={ret}");
                 });

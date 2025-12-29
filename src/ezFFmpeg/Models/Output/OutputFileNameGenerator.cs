@@ -1,4 +1,5 @@
 ﻿using ezFFmpeg.Common;
+using ezFFmpeg.Models.Common;
 using ezFFmpeg.Models.Encoder;
 using System;
 using System.Collections.Generic;
@@ -8,38 +9,106 @@ using System.Text.RegularExpressions;
 
 namespace ezFFmpeg.Models.Output
 {
+
     /// <summary>
     /// 出力ファイル名を生成するユーティリティクラス。
-    /// AppSettings のプロファイル情報とテンプレートを使用して、最終的な出力ファイル名を作成する。
+    /// プロファイル設定とテンプレート文字列を元に、
+    /// タグ置換を行い最終的な出力ファイル名を生成する。
     /// </summary>
     public static class OutputFileNameGenerator
     {
+
         /// <summary>
-        /// 指定した入力ファイル名と設定情報に基づき、出力ファイル名を生成する。
+        /// ビデオエンコーダー用のタグ文字列を取得する。
+        /// Copy の場合は入力ファイルのコーデック名を使用する。
         /// </summary>
-        /// <param name="fileName">入力ファイル名（フルパス可）</param>
-        /// <param name="settings">アプリケーション設定および現在のプロファイル情報</param>
+        /// <param name="file">入力ファイル情報</param>
+        /// <param name="profile">現在のプロファイル</param>
+        /// <returns>ビデオエンコーダーを表す文字列</returns>
+        private static string GetVideoEncoderTag(FileItem file, Profile profile)
+        {
+            if (profile.IsVideoEnabled)
+            {
+
+                var videoEncoder = VideoEncoders.GetCodec(profile.VideoEncoder);
+
+                if (videoEncoder.IsCopy)
+                {
+                    return file.VideoCodec ?? "none";
+                }
+                else
+                {
+                    return videoEncoder.Name.Replace(".", "");
+                }
+            }
+            else
+            {
+                return "none";
+            }
+        }
+
+        /// <summary>
+        /// オーディオエンコーダー用のタグ文字列を取得する。
+        /// Copy の場合は入力ファイルのコーデック名を使用する。
+        /// </summary>
+        /// <param name="file">入力ファイル情報</param>
+        /// <param name="profile">現在のプロファイル</param>
+        /// <returns>オーディオエンコーダーを表す文字列</returns>
+        private static string GetAudioEncoderTag(FileItem file, Profile profile)
+        {
+            if (profile.IsAudioEnabled)
+            {
+
+                var audioEncoder = AudioEncoders.GetCodec(profile.AudioEncoder);
+
+                if (audioEncoder.IsCopy)
+                {
+                    return file.AudioCodec ?? "none";
+                }
+                else
+                {
+                    return audioEncoder.Name.Replace(".", "");
+                }
+            }
+            else
+            {
+                return "none";
+            }
+        }
+
+        /// <summary>
+        /// ビデオ解像度用のタグ文字列を取得する。
+        /// </summary>
+        /// <param name="profile">現在のプロファイル</param>
+        /// <returns>解像度タグ文字列</returns>
+        private static string GetVideoResolutionTag(Profile profile) => profile.IsVideoEnabled ? profile.VideoResolution : "none";
+
+        /// <summary>
+        /// 指定した入力ファイルとアプリケーション設定に基づき、
+        /// 出力ファイル名を生成する。
+        /// </summary>
+        /// <param name="file">入力ファイル情報</param>
+        /// <param name="settings">アプリケーション設定（現在のプロファイルを含む）</param>
         /// <returns>生成された出力ファイル名</returns>
-        public static string Generate(string fileName, AppSettings settings)
+        public static string Generate(FileItem file, AppSettings settings)
         {
             // 各タグに対応する値を設定
             var tags = new Dictionary<string, string>
             {
-                [OutputFileTags.FileName.Tag] = Path.GetFileNameWithoutExtension(fileName),
-                [OutputFileTags.VideoCodec.Tag] = VideoEncoders.GetCodec(settings.CurrentProfile.VideoEncoder).Name.Replace(".", ""),
-                [OutputFileTags.AudioCodec.Tag] = AudioEncoders.GetCodec(settings.CurrentProfile.AudioEncoder).Name.Replace(".", ""),
-                [OutputFileTags.VideoResolution.Tag] = settings.CurrentProfile.VideoResolution,
-                [OutputFileTags.Extension.Tag] = settings.CurrentProfile.OutputFormat,
+                [OutputFileTags.FileName.Tag] = Path.GetFileNameWithoutExtension(file.FilePath),
+                [OutputFileTags.VideoCodec.Tag] = GetVideoEncoderTag(file,settings.CurrentProfile),
+                [OutputFileTags.VideoResolution.Tag] = GetVideoResolutionTag(settings.CurrentProfile),
+                [OutputFileTags.AudioCodec.Tag] = GetAudioEncoderTag(file, settings.CurrentProfile),
                 [OutputFileTags.TimeStamp.Tag] = settings.ProcessStartTime.ToString("yyyyMMddHHmmss")
             };
 
             // プロファイルで指定された出力ファイル名テンプレート
-            string ret = settings.CurrentProfile.OutputFileFormat;
+            string ret = $"{settings.CurrentProfile.OutputFileFormat}{settings.CurrentProfile.OutputFormat}";
 
             // タグをテンプレート内に置換
             foreach (var tag in tags)
             {
-                string pattern = $@"\{{{Regex.Escape(tag.Key)}\}}"; // {tag} の形式にマッチ
+                string pattern = $@"\{{{Regex.Escape(tag.Key)}\}}"; // {tag} の形式にマッチs
                 ret = Regex.Replace(ret, pattern, tag.Value, RegexOptions.IgnoreCase);
             }
 
