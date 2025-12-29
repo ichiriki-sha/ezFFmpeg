@@ -46,13 +46,13 @@ namespace ezFFmpeg.Services.FFmpeg
         {
             if(!string.IsNullOrWhiteSpace(profile.VideoFrameRateMode))
             {
-                var FrameRateMode = VideoFrameRateModes.GetFrameRateMode(profile.VideoFrameRateMode);
+                var videoFrameRateMode = VideoFrameRateModes.GetFrameRateMode(profile.VideoFrameRateMode);
 
-                if (FrameRateMode.IsPassthrough)
+                if (videoFrameRateMode.IsPassthrough)
                 {
                     // 変更しない場合は何もしない
                 }
-                else if (FrameRateMode.IsCfr)
+                else if (videoFrameRateMode.IsCfr)
                 {
                     if (!string.IsNullOrEmpty(profile.VideoFrameRate))
                     {
@@ -60,7 +60,7 @@ namespace ezFFmpeg.Services.FFmpeg
                     }
                     sb.Append("-vsync cfr ");
                 }
-                else if (FrameRateMode.IsVfr)
+                else if (videoFrameRateMode.IsVfr)
                 {
                     sb.Append("-vsync vfr ");
                 }
@@ -171,11 +171,11 @@ namespace ezFFmpeg.Services.FFmpeg
                 }
 
                 var audioEncoder = AudioEncoders.GetEncoder(profile.AudioEncoder);
-                var BitRate = AudioBitRates.GetBitRate(profile.AudioBitRate);
+                var audioBitRate = AudioBitRates.GetBitRate(profile.AudioBitRate);
 
                 if (!string.IsNullOrEmpty(profile.AudioBitRate) &&
                     !audioEncoder.IsCopy  &&
-                    !BitRate.IsSource)
+                    !audioBitRate.IsSource)
                 {
                     sb.Append($"-b:a {profile.AudioBitRate} ");
                 }
