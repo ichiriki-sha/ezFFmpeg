@@ -13,6 +13,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.9.3] - 2026-12-29
+
+### Update
+
+- プリセット定義をタプルからクラスに修正
+- 出力定義の拡張子をプログラムで設定するように修正
+
 ## [0.9.2] - 2026-12-28
 
 ### Update
