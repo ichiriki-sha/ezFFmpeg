@@ -34,11 +34,11 @@ namespace ezFFmpeg.Models.Output
 
                 if (videoEncoder.IsCopy)
                 {
-                    return file.VideoCodec ?? "none";
+                    return file.VideoCodec.ToLower() ?? "none";
                 }
                 else
                 {
-                    return videoEncoder.Name.Replace(".", "");
+                    return videoEncoder.Name.Replace(".", "").ToLower();
                 }
             }
             else
@@ -63,11 +63,11 @@ namespace ezFFmpeg.Models.Output
 
                 if (audioEncoder.IsCopy)
                 {
-                    return file.AudioCodec ?? "none";
+                    return file.AudioCodec.ToLower() ?? "none";
                 }
                 else
                 {
-                    return audioEncoder.Name.Replace(".", "");
+                    return audioEncoder.Name.Replace(".", "").ToLower();
                 }
             }
             else
