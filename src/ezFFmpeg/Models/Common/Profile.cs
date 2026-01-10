@@ -192,7 +192,6 @@ namespace ezFFmpeg.Models.Common
         public Profile()
         {
             _profileId = Guid.NewGuid();
-            _profileName = "既定(H.264 / MP4)";
             _outputFormat = OutputFormats.Mp4.Extension;
             _outputFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
             _outputFileFormat = $"{{{OutputFileTags.FileName.Tag}}}_{{{OutputFileTags.VideoCodec.Tag}}}{{{OutputFileTags.AudioCodec.Tag}}}";
@@ -208,6 +207,8 @@ namespace ezFFmpeg.Models.Common
             _isAudioEnabled = true;
             _audioEncoder = AudioEncoders.Copy.Encoder;
             _audioBitRate = AudioBitRates.Source.BitRate;
+
+            _profileName = $"既定({BuildProfileName()})"; 
 
             _isUserDefined = false;
             _isDefault = false;
@@ -245,6 +246,77 @@ namespace ezFFmpeg.Models.Common
         public void CopyFrom(Profile source, bool includeId = false)
         {
             ProfileMapper.CopyTo(source, this, includeId);
+        }
+
+        // ============================
+        // 表示用文字列生成
+        // ============================
+
+        /// <summary>
+        /// 出力形式・ビデオ・オーディオの概要情報を生成する。
+        /// UI 表示やプロファイル名生成に使用される。
+        /// </summary>
+        private (string OutputName ,string VideoEncoderName ,string AudioEncoderName) BuildOutputSummary()
+        {
+            string outputName = OutputFormats.GetName(OutputFormat);
+            VideoEncoder videoEncoder = VideoEncoders.GetEncoder(VideoEncoder);
+            AudioEncoder audioEncoder = AudioEncoders.GetEncoder(AudioEncoder);
+            string video;
+            string audio;
+
+            if (IsVideoEnabled)
+            {
+                // ビデオ が有効な場合
+                video = videoEncoder.IsCopy ? "Copy" : videoEncoder.Name;
+            }
+            else
+            {
+                // ビデオ が無効な場合
+                video = "Disabled";
+            }
+
+            if (IsAudioEnabled)
+            {
+                // オーディオ が有効な場合
+                audio = audioEncoder.IsCopy ? "Copy" : audioEncoder.Name;
+            }
+            else
+            {
+                // オーディオ が有効な場合
+                audio = "Disabled";
+            }
+            
+            return (outputName, video, audio);
+        }
+
+        /// <summary>
+        /// プロファイルの表示名を自動生成する。
+        /// </summary>
+        public string BuildProfileName()
+        {
+            var summary =  BuildOutputSummary();
+
+            return $"{summary.OutputName} - {summary.VideoEncoderName} / {summary.AudioEncoderName}";
+        }
+
+        /// <summary>
+        /// ビデオエンコーダー状態を UI 用文字列で返す。
+        /// </summary>
+        public string BuildVideoEncoderStstus()
+        {
+            var summary = BuildOutputSummary();
+
+            return $"{UiIcons.Video}{summary.VideoEncoderName}";
+        }
+
+        /// <summary>
+        /// オーディオエンコーダー状態を UI 用文字列で返す。
+        /// </summary>
+        public string BuildAudioEncoderStatus()
+        {
+            var summary = BuildOutputSummary();
+
+            return $"{UiIcons.Audio}{summary.AudioEncoderName}";
         }
     }
 }

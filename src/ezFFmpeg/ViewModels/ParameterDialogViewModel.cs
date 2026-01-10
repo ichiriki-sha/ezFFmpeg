@@ -308,7 +308,6 @@ namespace ezFFmpeg.ViewModels
         public ObservableCollection<SelectionItem> VideoFrameRateList { get; } = [];
 
         // オーディオ設定リスト
-        //public ObservableCollection<SelectionItem> AudioEncoderList { get; } = [];
         private ObservableCollection<SelectionItem> _audioEncoderList = [];
         public ObservableCollection<SelectionItem> AudioEncoderList
         {
@@ -386,7 +385,6 @@ namespace ezFFmpeg.ViewModels
             SetModeDefaults(mode);
 
             // プロファイルの設定
-            //CopyFrom(profile, true);
             ProfileMapper.CopyTo(profile, this, true);
 
 
@@ -398,7 +396,6 @@ namespace ezFFmpeg.ViewModels
 
             // 戻り値の初期化
             Result = new ParameterDialogResult();
-            //Result.CopyFrom(profile, true);
             ProfileMapper.CopyTo(profile, Result, true);
         }
 

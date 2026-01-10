@@ -5,6 +5,7 @@
         xmlns:c="clr-namespace:ezFFmpeg.Converters"
         xmlns:b="clr-namespace:ezFFmpeg.Behaviors"
         xmlns:mc="clr-namespace:ezFFmpeg.Models.Common"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         Icon="pack://application:,,,/Resources/Images/AppIcon.Ico"
         Title="ezFFmpeg" Width="960" Height="640" 
         MinWidth="100" MinHeight="100"
@@ -249,10 +250,10 @@
 
                         <Border.BorderBrush>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#A0A0A0" Offset="0.0"/>
                                 <!-- 左上：濃い -->
-                                <GradientStop Color="#FFFFFF" Offset="1.0"/>
+                                <GradientStop Color="#A0A0A0" Offset="0.0"/>
                                 <!-- 右下：明るい -->
+                                <GradientStop Color="#FFFFFF" Offset="1.0"/>
                             </LinearGradientBrush>
                         </Border.BorderBrush>
 
@@ -311,11 +312,7 @@
 
                     <!-- Events -->
                     <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseDoubleClick">
-                            <i:InvokeCommandAction Command="{Binding FileItemDoubleClickCommand}"
-                                   CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListView}}" />
-                        </i:EventTrigger>
-
+                        
                         <i:EventTrigger EventName="SelectionChanged">
                             <i:InvokeCommandAction Command="{Binding FileListViewSelectionChangedCommand}"
                                    PassEventArgsToCommand="True" />
@@ -372,7 +369,7 @@
                                     <!-- チェックボックス欄 -->
                                     <ColumnDefinition Width="20"/>
                                     <!-- アイコン -->
-                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="100"/>
                                     <!-- テキスト -->
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
@@ -387,12 +384,14 @@
                                                               Converter={StaticResource InverseBoolConverter}}">
 
                                     <i:Interaction.Triggers>
+                                        
                                         <i:EventTrigger EventName="Checked">
                                             <i:InvokeCommandAction 
                                             Command="{Binding DataContext.FileItemCheckedCommand,
                                                               RelativeSource={RelativeSource AncestorType=ListView}}"
                                             CommandParameter="{Binding}" />
                                         </i:EventTrigger>
+                                        
                                         <i:EventTrigger EventName="Unchecked">
                                             <i:InvokeCommandAction 
                                             Command="{Binding DataContext.FileItemUncheckedCommand,
@@ -402,8 +401,8 @@
                                     </i:Interaction.Triggers>
                                 </CheckBox>
 
-                                <Grid Grid.Column="1" Width="80" Height="80">
-                                    <!-- サムネイル（全面に表示） -->
+                                <Grid Grid.Column="1" Width="90" Height="80">
+                                    <!-- サムネイル -->
                                     <Image Source="{Binding VideoThumbnail}"
                                            Stretch="Uniform"
                                            HorizontalAlignment="Center"
@@ -412,35 +411,33 @@
                                     <!-- 右下に重ねる進捗エリア -->
                                     <Grid HorizontalAlignment="Right"
                                           VerticalAlignment="Bottom"
-                                          Height="16">
+                                          Height="16"
+                                          Width="80">
 
-                                        <Grid.ColumnDefinitions>
-                                            <!-- ProgressBar -->
-                                            <ColumnDefinition Width="70"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <!-- ProgressBar + Text -->
-                                        <Grid Grid.Column="0">
+                                        <!-- ProgressBar + Text を重ねる -->
+                                        <Grid Width="Auto">
                                             <ProgressBar Minimum="0"
                                                          Maximum="100"
                                                          Value="{Binding Progress}"
                                                          Height="16"/>
+
+                                            <!-- 中央テキスト -->
                                             <TextBlock Text="{Binding StatusText, FallbackValue='Loading...'}"
-                                                       Panel.ZIndex="1"
                                                        FontSize="8"
                                                        FontWeight="Bold"
                                                        HorizontalAlignment="Center"
-                                                       VerticalAlignment="Center">
+                                                       VerticalAlignment="Center"
+                                                       Panel.ZIndex="1">
+
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
-                                                        <!-- デフォルト色 -->
                                                         <Setter Property="Foreground" Value="Black"/>
 
                                                         <Style.Triggers>
-                                                            <!-- Status が Error のとき赤色 -->
-                                                            <DataTrigger Binding="{Binding Status}" Value="{x:Static mc:ProcessingStatus.Error}">
-                                                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                                                            <!-- Error 時 -->
+                                                            <DataTrigger Binding="{Binding Status}"
+                                                                            Value="{x:Static mc:ProcessingStatus.Error}">
+                                                                <Setter Property="Foreground" Value="White"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -453,12 +450,14 @@
                                 <!-- 3. 右側の2段テキスト -->
                                 <Grid Grid.Column="2" Margin="8 0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="25"/>
                                         <!-- ファイル名 -->
-                                        <RowDefinition Height="22"/>
-                                        <!-- 詳細 -->
-                                        <RowDefinition Height="22"/>
-                                        <!-- 進捗バー -->
+                                        <RowDefinition Height="25"/>
+                                        <!-- ファイル情報 -->
+                                        <RowDefinition Height="20"/>
+                                        <!-- メディア情報 -->
+                                        <RowDefinition Height="20"/>
+                                        <!-- その他  -->
+                                        <RowDefinition Height="20"/>
                                     </Grid.RowDefinitions>
 
                                     <!-- 1段目：ファイル名 -->
@@ -479,7 +478,7 @@
                                         <TextBlock Text="{Binding FileLastWriteTimeInfo}" Foreground="#666"/>
                                     </StackPanel>
 
-                                    <!-- 3段目：ビデオ／オーディオ情報 -->
+                                    <!-- 3段目：メディア情報 -->
                                     <StackPanel Grid.Row="2"
                                                 Margin="8 0"
                                                 Orientation="Horizontal"
@@ -488,6 +487,102 @@
                                         <TextBlock Text="{Binding VideoInfo}" Margin="4 0" Foreground="#666"/>
                                         <TextBlock Text="{Binding AudioInfo}" Margin="4 0" Foreground="#666"/>
                                     </StackPanel>
+                                    
+                                    <!-- 4段目：その他 -->
+                                    <Grid Grid.Row="3" Margin="8 0">
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Column="0"
+                                                   Grid.Row="0"
+                                                   Grid.RowSpan="2"
+                                                   VerticalAlignment="Center" 
+                                                   Text="▸変換開始" 
+                                                   Margin="4 0" 
+                                                   Foreground="#000" />
+
+                                        <TextBox x:Name="StartPositionTextBox"
+                                                 Grid.Column="1" 
+                                                 Grid.Row="0"
+                                                 Grid.RowSpan="2"
+                                                 Width="54"
+                                                 HorizontalAlignment="Right" 
+                                                 Text="{Binding StartPositionText,
+                                                        UpdateSourceTrigger=PropertyChanged}"
+                                                 IsReadOnly="{Binding DataContext.IsReadOnly,
+                                                        RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                 b:TextBoxCaretBehavior.EnableCaretTracking="True">
+
+                                            <TextBox.Style>
+                                                <Style TargetType="TextBox">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsReadOnly" Value="True">
+                                                            <Setter Property="Background" Value="#EEE"/>
+                                                            <Setter Property="Foreground" Value="#888"/>
+                                                            <Setter Property="BorderBrush" Value="#AAA"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBox.Style>
+
+                                            <TextBox.InputBindings>
+                                                <KeyBinding Key="Up"
+                                                            Command="{Binding DataContext.FileItemStartPositionUpCommand,
+                                                                                RelativeSource={RelativeSource AncestorType=ListView}}"/>
+                                                <KeyBinding Key="Down"
+                                                            Command="{Binding DataContext.FileItemStartPositionDownCommand,
+                                                                              RelativeSource={RelativeSource AncestorType=ListView}}"/>
+                                            </TextBox.InputBindings>
+
+                                        </TextBox>
+
+                                        <RepeatButton Grid.Column="2"
+                                                      Grid.Row="0"
+                                                      BorderBrush="LightGray"
+                                                      BorderThickness="1"
+                                                      Delay="400"
+                                                      Interval="100"
+                                                      Focusable="False"
+                                                      Command="{Binding DataContext.FileItemStartPositionUpCommand, 
+                                                                RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                      IsEnabled="{Binding DataContext.IsReadOnly,
+                                                                RelativeSource={RelativeSource AncestorType=ListView},
+                                                                Converter={StaticResource InverseBoolConverter}}"
+                                                      b:FocusTargetBehavior.FocusTarget="{Binding ElementName=StartPositionTextBox}">
+                                            
+                                            <Image Source="pack://application:,,,/Resources/Images/Up.png"
+                                                   Width="16"
+                                                   Height="6"/>
+                                        </RepeatButton>
+                                        
+                                        <RepeatButton Grid.Column="2"
+                                                      Grid.Row="1"
+                                                      BorderBrush="LightGray"
+                                                      BorderThickness="1"
+                                                      Delay="400"
+                                                      Interval="100"
+                                                      Focusable="False"
+                                                      Command="{Binding DataContext.FileItemStartPositionDownCommand, 
+                                                                RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                      IsEnabled="{Binding DataContext.IsReadOnly,
+                                                                RelativeSource={RelativeSource AncestorType=ListView},
+                                                                Converter={StaticResource InverseBoolConverter}}"
+                                                      b:FocusTargetBehavior.FocusTarget="{Binding ElementName=StartPositionTextBox}">
+
+                                            <Image Source="pack://application:,,,/Resources/Images/Down.png"
+                                                   Width="16"
+                                                   Height="6"/>
+                                        </RepeatButton>
+                                    </Grid>
                                 </Grid>
                             </Grid>
                         </DataTemplate>
@@ -531,6 +626,7 @@
                                  FontSize="11"
                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
                                  ScrollViewer.HorizontalScrollBarVisibility="Auto">
+
                             <i:Interaction.Behaviors>
                                 <b:AutoScrollToEndBehavior />
                             </i:Interaction.Behaviors>
@@ -563,9 +659,10 @@
                                 Converter={StaticResource BoolToVisibilityConverter}}">
 
             <Grid>
+
                 <Grid.RowDefinitions>
-                        <RowDefinition Height="200"/>
-                        <RowDefinition Height="*"/>
+                    <RowDefinition Height="200"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
                     <!-- ===== 動画プレビュー ===== -->
@@ -589,6 +686,7 @@
                                         <b:MediaElementControlBehavior Preview="{Binding Preview}" />
                                     </i:Interaction.Behaviors>
                         </MediaElement>
+                        
                         <!-- ===== 再生コントロール（動画の上に重ねる） ===== -->
                         <Border VerticalAlignment="Bottom"
                                 HorizontalAlignment="Stretch"
@@ -601,6 +699,7 @@
                             </Border.RenderTransform>
 
                             <Border.Style>
+                                
                                 <Style TargetType="Border">
 
                                     <!-- 初期状態 -->
@@ -666,12 +765,12 @@
                             <Grid>
 
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
                                     <!-- 再生ボタン -->
                                     <ColumnDefinition Width="Auto"/>
                                     <!-- 時間 -->
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
                                     <!-- シークバー -->
+                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
                                 <!-- 再生 / 一時停止 -->
@@ -679,10 +778,11 @@
                                         Command="{Binding Preview.TogglePlayPauseCommand}"
                                         Background="Transparent"
                                         BorderThickness="0">
+
                                     <Button.Template>
                                         <ControlTemplate TargetType="Button">
                                             <ContentPresenter HorizontalAlignment="Center"
-                                      VerticalAlignment="Center"/>
+                                                              VerticalAlignment="Center"/>
                                         </ControlTemplate>
                                     </Button.Template>
 
@@ -732,6 +832,7 @@
                         <!-- ファイル名 + アイコン -->
                         <Grid Grid.Row="0"
                               Margin="0,0,0,4">
+
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
@@ -942,7 +1043,6 @@
 
                                 </Grid>
                             </StackPanel>
-
 
                         </ScrollViewer>
 

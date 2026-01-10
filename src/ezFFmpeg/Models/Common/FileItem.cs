@@ -6,14 +6,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Printing;
 using System.IO;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ezFFmpeg.Models.Common
 {
@@ -21,9 +17,8 @@ namespace ezFFmpeg.Models.Common
     /// ファイル情報とメディア情報を保持するクラス。
     /// UIバインディング用に INotifyPropertyChanged を実装している。
     /// </summary>
-    public class FileItem : INotifyPropertyChanged
+    public class FileItem : BindableBase
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
 
         // --------------------
         // ファイル情報
@@ -73,12 +68,7 @@ namespace ezFFmpeg.Models.Common
         public ImageSource? VideoThumbnail
         {
             get => _videoThumbnail;
-            set
-            {
-                if (_videoThumbnail == value) return;
-                _videoThumbnail = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(VideoThumbnail)));
-            }
+            set => SetProperty(ref _videoThumbnail, value);
         }
 
         // --------------------
@@ -125,14 +115,7 @@ namespace ezFFmpeg.Models.Common
         /// <summary>処理ログの行コレクション</summary>
         public ObservableCollection<string> ProcessingLogLines { get; } = [];
 
-        /// <summary>
-        /// プロパティ変更通知を発行
-        /// </summary>
-        protected void RaisePropertyChanged([CallerMemberName] string? name = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-
         private ProcessingStatus _status;
-
         /// <summary>
         /// 処理状況
         /// </summary>
@@ -141,10 +124,8 @@ namespace ezFFmpeg.Models.Common
             get => _status;
             set
             {
-                if (_status == value) return;
-                _status = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Status)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StatusText)));
+                if (SetProperty(ref _status, value))
+                    RaisePropertyChanged(nameof(StatusText));
             }
         }
 
@@ -156,14 +137,7 @@ namespace ezFFmpeg.Models.Common
         public bool IsSelected
         {
             get => _isSelected;
-            set
-            {
-                if (_isSelected != value)
-                {
-                    _isSelected = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
-                }
-            }
+            set => SetProperty(ref _isSelected, value); 
         }
 
         private FileItem? _selectedFileItem;
@@ -174,12 +148,7 @@ namespace ezFFmpeg.Models.Common
         public FileItem? SelectedFileItem
         {
             get => _selectedFileItem;
-            set
-            {
-                if (_selectedFileItem == value) return;
-                _selectedFileItem = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedFileItem)));
-            }
+            set => SetProperty(ref _selectedFileItem, value);
         }
 
         private bool _isChecked;
@@ -190,14 +159,7 @@ namespace ezFFmpeg.Models.Common
         public bool IsChecked
         {
             get => _isChecked;
-            set
-            {
-                if (_isChecked != value)
-                {
-                    _isChecked = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsChecked)));
-                }
-            }
+            set => SetProperty(ref _isChecked, value);
         }
 
         private double _progress;
@@ -210,12 +172,8 @@ namespace ezFFmpeg.Models.Common
             get => _progress;
             set
             {
-                if (_progress != value)
-                {
-                    _progress = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Progress)));
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StatusText)));
-                }
+                if (SetProperty(ref _progress, value))
+                    RaisePropertyChanged(nameof(StatusText));
             }
         }
 
@@ -231,6 +189,42 @@ namespace ezFFmpeg.Models.Common
             ProcessingStatus.Error => "エラー",
             _ => ""
         };
+
+        private TimeSpan _startPosition = TimeSpan.Zero;
+        public TimeSpan StartPosition
+        {
+            get => _startPosition;
+            set 
+            {
+                value = value < TimeSpan.Zero ? TimeSpan.Zero : value;
+                value = value > VideoDuration ? VideoDuration : value;
+                if (SetProperty(ref _startPosition, value))
+                    RaisePropertyChanged(nameof(StartPositionText));
+            }
+        }
+
+        /// <summary>
+        /// TextBox 表示用 (hh:mm:ss)
+        /// </summary>
+        public string StartPositionText
+        {
+            get => StartPosition.ToString(@"hh\:mm\:ss");
+            set
+            {
+                if (TimeSpan.TryParse(value, out var ts))
+                {
+                    StartPosition = ts;
+                }
+                // 失敗時は何もしない
+            }
+        }
+
+        private int _startPositionCaretIndex = 8;
+        public int StartPositionCaretIndex
+        {
+            get => _startPositionCaretIndex;
+            set => SetProperty(ref _startPositionCaretIndex, value);
+        }
 
         /// <summary>
         /// 元の MediaInfo を保持
@@ -254,6 +248,8 @@ namespace ezFFmpeg.Models.Common
             VideoBitRate = string.Empty;
             VideoFrameRate = string.Empty;
             MediaInfo = null!;
+            StartPosition = TimeSpan.Zero;
+
         }
 
         /// <summary>
@@ -305,6 +301,7 @@ namespace ezFFmpeg.Models.Common
             IsChecked = true;
             Progress = 0;
             Status = ProcessingStatus.Pending;
+
         }
     }
 }

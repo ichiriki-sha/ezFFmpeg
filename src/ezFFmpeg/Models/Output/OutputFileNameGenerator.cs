@@ -34,7 +34,7 @@ namespace ezFFmpeg.Models.Output
 
                 if (videoEncoder.IsCopy)
                 {
-                    return file.VideoCodec.ToLower() ?? "none";
+                    return string.IsNullOrEmpty(file.VideoCodec) ? "none" : file.VideoCodec.ToLower();
                 }
                 else
                 {
@@ -63,7 +63,7 @@ namespace ezFFmpeg.Models.Output
 
                 if (audioEncoder.IsCopy)
                 {
-                    return file.AudioCodec.ToLower() ?? "none";
+                    return string.IsNullOrEmpty(file.AudioCodec) ? "none" : file.AudioCodec.ToLower();
                 }
                 else
                 {

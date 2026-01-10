@@ -132,7 +132,6 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
-                            <!--<ColumnDefinition Width="28"/>-->
                         </Grid.ColumnDefinitions>
 
                         <!-- プロファイル一覧 -->
@@ -173,42 +172,10 @@
                                     <GridViewColumn Header="プロファイル名"
                                                     DisplayMemberBinding="{Binding ProfileName}"
                                                     Width="250"/>
-
-                                    <!-- 種別 -->
-                                    <!--<GridViewColumn Header="種別" Width="80">
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <TextBlock Text="{Binding IsUserDefined,
-                                                                    Converter={StaticResource UserPresetConverter}}"/>
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>-->
-
                                 </GridView>
                             </ListView.View>
                         </ListView>
 
-                        <!--<Grid Grid.Row="0"
-                              Grid.Column="2">
-
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-
-                            <Button Grid.Row="0"
-                                    Content="↓"
-                                    VerticalAlignment="Top"
-                                    Height="25"
-                                    Margin="0,24,0,0" />
-
-                            <Button Grid.Row="1"
-                                    Content="↑"
-                                    VerticalAlignment="Bottom"
-                                    Height="25"
-                                    Margin="0,0,0,2" />
-                        </Grid>-->
-                        
                         <!-- ボタン -->
                         <StackPanel Grid.Row="1" 
                                     Grid.Column="0"
@@ -221,6 +188,7 @@
                                 IsEnabled="{Binding IsDefualtProfileEnabled}"
                                 Command="{Binding DefaultProfileCommand}"/>
                         </StackPanel>
+                        
                         <StackPanel Grid.Row="1" 
                                     Grid.Column="1"
                                 Orientation="Horizontal"
@@ -261,6 +229,7 @@
             <TabItem Header="詳細">
                 
                 <Grid Margin="10">
+
                     <Grid.RowDefinitions>
                         <!-- 並列数 -->
                         <RowDefinition Height="30"/>
@@ -301,46 +270,84 @@
                                VerticalAlignment="Center"
                                TextAlignment="Left"/>
 
-                    <StackPanel
-                                Grid.Row="1"
-                                Grid.Column="2"
-                                Grid.ColumnSpan="2"
-                                Orientation="Horizontal"
-                                VerticalAlignment="Center" 
-                                Height="25">
+                    <Grid Grid.Row="1"
+                          Grid.Column="2"
+                          Grid.ColumnSpan="2"
+                          VerticalAlignment="Center">
+                        
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                        <!-- 数値入力 -->
-                        <TextBox Name="ParallelCountTextBox"
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBox x:Name="ParallelCountText" 
+                                 Grid.Column="0"
+                                 Grid.Row="0"
+                                 Grid.RowSpan="2"
                                  Width="60"
-                                 Height="25"
+                                 Height="20"
                                  TextAlignment="Right"
                                  VerticalContentAlignment="Center"
-                                 Text="{Binding ParallelCount, Mode=TwoWay, StringFormat=F0, UpdateSourceTrigger=PropertyChanged}">
+                                 Text="{Binding ParallelCountText}"
+                                 b:TextBoxCaretInitializer.CaretToEndOnLoad="True">
+
                             <TextBox.InputBindings>
                                 <KeyBinding Key="Up"
-                                        Command="{Binding ChangeParallelCountCommand}"
-                                        CommandParameter="Up" />
-
+                                            Command="{Binding DataContext.ParallelCountUpCommand,
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"/>
                                 <KeyBinding Key="Down"
-                                        Command="{Binding ChangeParallelCountCommand}"
-                                        CommandParameter="Down" />
+                                            Command="{Binding DataContext.ParallelCountDownCommand,
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"/>
                             </TextBox.InputBindings>
                         </TextBox>
 
-                        <!-- 縦スクロールバー -->
-                        <ScrollBar x:Name="ParallelCountScrollBar"
-                                   Orientation="Vertical"
-                                   Height="25"
-                                   Minimum="{Binding ParallelMin}"
-                                   Maximum="{Binding ParallelMax}"
-                                   Value="{Binding ParallelCount, Mode=TwoWay}"
-                                   SmallChange="1"
-                                   LargeChange="1" />
+                        <RepeatButton Grid.Column="1"
+                                      Grid.Row="0"
+                                      BorderBrush="LightGray"
+                                      BorderThickness="1"
+                                      Delay="400"
+                                      Interval="100"
+                                      Focusable="False"
+                                      Command="{Binding DataContext.ParallelCountUpCommand,
+                                                RelativeSource={RelativeSource AncestorType=Window}}"
+                                      b:FocusTargetBehavior.FocusTarget="{Binding ElementName=ParallelCountText}">
+
+
+                            <Image Source="pack://application:,,,/Resources/Images/Up.png"
+                                                       Width="16"
+                                                       Height="6"/>
+                        </RepeatButton>
+
+                        <RepeatButton Grid.Column="1"
+                                      Grid.Row="1"
+                                      BorderBrush="LightGray"
+                                      Delay="400"
+                                      Interval="100"
+                                      Focusable="False"
+                                      Command="{Binding DataContext.ParallelCountDownCommand,
+                                                RelativeSource={RelativeSource AncestorType=Window}}"
+                                      b:FocusTargetBehavior.FocusTarget="{Binding ElementName=ParallelCountText}">
+
+
+                            <Image Source="pack://application:,,,/Resources/Images/Down.png"
+                                                        Width="16"
+                                                        Height="6"/>
+                        </RepeatButton>
 
                         <!-- 説明 -->
-                        <TextBlock Text="{Binding ParallelRange}" VerticalAlignment="Center" Margin="18 0 0 0"/>
-                    </StackPanel>
-
+                        <TextBlock Grid.Column="2"
+                                   Grid.Row="0"
+                                   Grid.RowSpan="2"
+                                   Text="{Binding ParallelRangeText}" 
+                                   VerticalAlignment="Center"
+                                   Margin="18 0 0 0"/>
+                    </Grid>
 
                     <!-- GPU 使用 -->
                     <CheckBox Grid.Row="2" 

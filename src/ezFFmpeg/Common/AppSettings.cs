@@ -162,7 +162,6 @@ namespace ezFFmpeg.Common
             // -----------------------------------------------
             var profile = new Profile() { IsDefault = true };
             Profiles.Add(profile);
-            //Profiles.Add(profile);
             CurrentProfile = profile;
 
             // FFmpeg フォルダが有効な場合のみサービスを生成

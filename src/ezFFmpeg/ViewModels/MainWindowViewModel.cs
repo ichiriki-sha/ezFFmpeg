@@ -3,6 +3,7 @@ using ezFFmpeg.Helpers;
 using ezFFmpeg.Models.Common;
 using ezFFmpeg.Models.Conversion;
 using ezFFmpeg.Models.Encoder;
+using ezFFmpeg.Models.Output;
 using ezFFmpeg.Services.Conversion;
 using ezFFmpeg.Services.FFmpeg;
 using ezFFmpeg.Services.Interfaces;
@@ -11,8 +12,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace ezFFmpeg.ViewModels
 {
@@ -185,7 +188,6 @@ namespace ezFFmpeg.ViewModels
         }
 
         private bool _isLogVisible = false;
-        //private GridLength _lastLogRowHeight = new(260);
         private GridLength _lastFileListRowHeigh ;
 
         public bool IsLogVisible
@@ -198,14 +200,12 @@ namespace ezFFmpeg.ViewModels
                     if (value)
                     {
                         // ON
-                        //LogRowHeight = _lastLogRowHeight
                         LogRowHeight = new GridLength(1, GridUnitType.Star);
                         FileListRowHeight = _lastFileListRowHeigh;
                     }
                     else
                     {
                         // OFF
-                        //_lastLogRowHeight = LogRowHeight;
                         _lastFileListRowHeigh = FileListRowHeight;
                         LogRowHeight = new GridLength(0);
                         FileListRowHeight = new GridLength(1, GridUnitType.Star);
@@ -321,8 +321,11 @@ namespace ezFFmpeg.ViewModels
         public ICommand FileListViewMouseLeftButtonDownCommand { get; }
         public ICommand FileListViewDropFilesCommand { get; }
 
+        // StartPotion 
+        public ICommand FileItemStartPositionUpCommand { get; }
+        public ICommand FileItemStartPositionDownCommand { get; }
+
         // FileListViewItem
-        public ICommand FileItemDoubleClickCommand { get; }
         public ICommand FileItemCheckedCommand { get; }
         public ICommand FileItemUncheckedCommand { get; }
 
@@ -383,9 +386,11 @@ namespace ezFFmpeg.ViewModels
             FileListViewDropFilesCommand            = new RelayCommand<string[]>(OnFilesDropped);
 
             // ListViewItem
-            FileItemDoubleClickCommand              = new RelayCommand<object>(OnFileItemDoubleClick);
             FileItemCheckedCommand                  = new RelayCommand<FileItem>(OnFileItemChecked);
             FileItemUncheckedCommand                = new RelayCommand<FileItem>(OnFileItemUnchecked);
+
+            FileItemStartPositionUpCommand          = new RelayCommand(() => ChangeFileItemStartPosition(1));
+            FileItemStartPositionDownCommand        = new RelayCommand(() => ChangeFileItemStartPosition(-1));
 
             // Help & Exit
             AboutCommand                            = new RelayCommand(ShowAbout);
@@ -403,7 +408,6 @@ namespace ezFFmpeg.ViewModels
             FileListRowHeight                       = _settings.FileListRowHeight;
             LogRowHeight                            = _settings.LogRowHeight;
             PreviewColumnWidth                      = _settings.PreviewColumnWidth;
-
 
             // エンコーダの状態を表示
             UpdateEncoderStatus();
@@ -425,61 +429,10 @@ namespace ezFFmpeg.ViewModels
         /// </summary>
         private void UpdateEncoderStatus()
         {
-            // =========================
             // ビデオエンコーダの状態更新
-            // =========================
-
-            // ビデオが有効な場合
-            if (_settings.CurrentProfile.IsVideoEnabled)
-            {
-                // 現在のプロファイルで選択されているビデオエンコーダを取得
-                VideoEncoder videoEncoder =
-                    VideoEncoders.GetEncoder(_settings.CurrentProfile.VideoEncoder);
-
-                // ストリームコピーの場合は Copy 表示
-                if (videoEncoder.IsCopy)
-                {
-                    VideoEncoderStatus = $"{UiIcons.Video}Copy";
-                }
-                // 再エンコードの場合はエンコーダ名を表示
-                else
-                {
-                    VideoEncoderStatus = $"{UiIcons.Video}{videoEncoder.Name}";
-                }
-            }
-            // ビデオが無効な場合
-            else
-            {
-                VideoEncoderStatus = $"{UiIcons.Video}Disabled";
-            }
-
-            // =========================
+            VideoEncoderStatus = _settings.CurrentProfile.BuildVideoEncoderStstus();
             // オーディオエンコーダの状態更新
-            // =========================
-
-            // オーディオが有効な場合
-            if (_settings.CurrentProfile.IsAudioEnabled)
-            {
-                // 現在のプロファイルで選択されているオーディオエンコーダを取得
-                AudioEncoder audioEncoder =
-                    AudioEncoders.GetEncoder(_settings.CurrentProfile.AudioEncoder);
-
-                // ストリームコピーの場合は Copy 表示
-                if (audioEncoder.IsCopy)
-                {
-                    AudioEncoderStatus = $"{UiIcons.Audio}Copy";
-                }
-                // 再エンコードの場合はエンコーダ名を表示
-                else
-                {
-                    AudioEncoderStatus = $"{UiIcons.Audio}{audioEncoder.Name}";
-                }
-            }
-            // オーディオが無効な場合
-            else
-            {
-                AudioEncoderStatus = $"{UiIcons.Audio}Disabled";
-            }
+            AudioEncoderStatus = _settings.CurrentProfile.BuildAudioEncoderStatus();
         }
 
         /// <summary>
@@ -706,10 +659,7 @@ namespace ezFFmpeg.ViewModels
 
                     lastUsed.CopyFrom((Profile)ret);
 
-                    if(!lastUsed.ProfileName.EndsWith(" - (前回使用)"))
-                    {
-                        lastUsed.ProfileName += " - (前回使用)";
-                    }
+                    lastUsed.ProfileName = $"前回使用({lastUsed.BuildProfileName()})";
                     lastUsed.IsDefault = isDefault;
                     lastUsed.IsUserDefined = false;
                     lastUsed.IsLastUsed = true;
@@ -719,7 +669,8 @@ namespace ezFFmpeg.ViewModels
                     // 前回使用プロファイルなし
                     lastUsed = new Profile ();
                     lastUsed.CopyFrom((Profile)ret);
-                    lastUsed.ProfileName += " - (前回使用)";
+
+                    lastUsed.ProfileName = $"前回使用({lastUsed.BuildProfileName()})";
                     lastUsed.IsDefault = false ;
                     lastUsed.IsUserDefined = false;
                     lastUsed.IsLastUsed = true;
@@ -839,18 +790,29 @@ namespace ezFFmpeg.ViewModels
         }
 
         /// <summary>
-        /// 指定されたファイルを OS の既定アプリで開く。
+        /// 変換開始時間を増減する。
         /// </summary>
-        private void ShowPreview(string fileName)
+        private void ChangeFileItemStartPosition(int duration)
         {
-            try
+            if (SelectedFileItem == null) return;
+
+            TimeSpan delta = SelectedFileItem.StartPositionCaretIndex switch
             {
-                Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
-            }
-            catch (Exception ex)
-            {
-                _dialogService.ShowMessageBox($"ファイルを開けませんでした:\n{ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                0 or 1 => TimeSpan.FromHours(10 * duration),    // 時間10の位
+                2 or 3 => TimeSpan.FromHours(1 * duration),     // 時間1の位
+                4 => TimeSpan.FromMinutes(10 * duration),       // 分10の位
+                5 or  6 => TimeSpan.FromMinutes(1 * duration),  // 分1の位
+                7 => TimeSpan.FromSeconds(10 * duration),       // 秒10の位
+                8 => TimeSpan.FromSeconds(1 * duration),        // 秒1の位
+                _ => TimeSpan.FromSeconds(0)
+            };
+
+            TimeSpan ts = SelectedFileItem.StartPosition.Add(delta);
+
+            //if (ts < TimeSpan.Zero || ts > SelectedFileItem.VideoDuration)
+            //    return;
+
+            SelectedFileItem.StartPosition = ts;
         }
 
         /// <summary>
@@ -860,18 +822,6 @@ namespace ezFFmpeg.ViewModels
         {
 
             AddItem(files);
-        }
-
-        /// <summary>
-        /// ファイル一覧でアイテムがダブルクリックされた際の処理。
-        /// 対象ファイルを OS 既定のアプリケーションで開く。
-        /// </summary>
-        private void OnFileItemDoubleClick(object obj)
-        {
-            if (obj is FileItem item)
-            {
-                ShowPreview(item.FilePath);
-            }
         }
 
         /// <summary>

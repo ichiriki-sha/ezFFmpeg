@@ -113,6 +113,7 @@
                                              IsReadOnly="True" 
                                              Text="{Binding OutputFolderPath}"/>
 
+
                                     <Button Grid.Row="1" 
                                             Grid.Column="2" 
                                             Margin="0,0,0,0" 
@@ -136,21 +137,26 @@
                                              VerticalAlignment="Center"
                                              VerticalContentAlignment="Center"   
                                              Text="{Binding OutputFileFormat, Mode=TwoWay}"
+                                             ToolTip="例: {name}_{vcodec}_{preset}_{timestamp}{extension}" 
                                              b:TextBoxInsertBehavior.InsertText="{Binding InsertTag}"
-                                             ToolTip="例: {name}_{vcodec}_{preset}_{timestamp}{extension}" />
+                                             b:TextBoxCaretInitializer.CaretToEndOnLoad="True"/>
 
                                     <Expander Grid.Row="3" 
                                               Grid.Column="1"
                                               Grid.ColumnSpan="2"
                                               Header="出力ファイル用タグ" 
-                                              IsExpanded="False">
+                                              IsExpanded="False"
+                                              Focusable="False">
 
                                         <StackPanel Margin="8">
 
                                             <ListBox Height="104"
                                                  ItemsSource="{Binding OutputFileTagList}"
                                                  SelectedValuePath="Key" 
-                                                 DisplayMemberPath="Name" >
+                                                 DisplayMemberPath="Name"
+                                                 Focusable="False"
+                                                 b:FocusTargetBehavior.FocusTarget="{Binding ElementName=OutputFileFormatTextBox}"
+                                                 b:ListBoxFocusOnSelectionBehavior.FocusTarget="{Binding ElementName=OutputFileFormatTextBox}" >
 
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="MouseDoubleClick">
@@ -158,7 +164,7 @@
                                                             Command="{Binding DataContext.InsertTagCommand,
                                                                               RelativeSource={RelativeSource AncestorType=Window}}"
                                                             CommandParameter="{Binding SelectedItem,
-                                                                                      RelativeSource={RelativeSource AncestorType=ListBox}}" />
+                                                                              RelativeSource={RelativeSource AncestorType=ListBox}}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                             </ListBox>

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace ezFFmpeg.Services.FFmpeg
 {
@@ -80,6 +81,14 @@ namespace ezFFmpeg.Services.FFmpeg
 
             // バナー非表示
             sb.Append("-hide_banner ");
+
+
+            // ★ 変換開始時間（入力シーク）
+            if (item.StartPosition > TimeSpan.Zero)
+            {
+                var startrTime = item.StartPosition.ToString(@"hh\:mm\:ss\.fff");
+                sb.Append($"-ss {startrTime} ");
+            }
 
             // 入力ファイル
             sb.Append($"-i \"{item.FilePath}\" ");

@@ -51,7 +51,28 @@ namespace ezFFmpeg.ViewModels
         public int ParallelCount
         {
             get => _parallelCount;
-            set => SetProperty(ref _parallelCount, value);
+            set {
+                value = Math.Max(value, ParallelMin);
+                value = Math.Min(value, ParallelMax);
+                if(SetProperty(ref _parallelCount, value))
+                    RaisePropertyChanged(nameof(ParallelCountText));
+            }
+        }
+
+        /// <summary>
+        /// 並列処理数
+        /// </summary>
+        public string ParallelCountText
+        {
+            get => _parallelCount.ToString();
+            set
+            {
+                if (int.TryParse(value, out var n))
+                {
+                    ParallelCount = n;
+                }
+                // 失敗時は何もしない
+            }
         }
 
         /// <summary>
@@ -76,8 +97,7 @@ namespace ezFFmpeg.ViewModels
         /// <summary>
         /// 並列数の範囲表示
         /// </summary>
-        public static string ParallelRange => $"({ParallelMin}～{ParallelMax})";
-
+        public static string ParallelRangeText => $"({ParallelMin}～{ParallelMax})";
 
         public ObservableCollection<Profile> ProfileItems => Profiles.Profiles;
 
@@ -105,23 +125,46 @@ namespace ezFFmpeg.ViewModels
 
         // プロファイル操作ボタンの有効/無効フラグ
         private bool _isDefualtProfileEnabled;
-        public bool IsDefualtProfileEnabled { get => _isDefualtProfileEnabled; set => SetProperty(ref _isDefualtProfileEnabled, value); }
+        public bool IsDefualtProfileEnabled 
+        { 
+            get => _isDefualtProfileEnabled; 
+            set => SetProperty(ref _isDefualtProfileEnabled, value); 
+        }
 
         private bool _isAddProfileEnabled;
-        public bool IsAddProfileEnabled { get => _isAddProfileEnabled; set => SetProperty(ref _isAddProfileEnabled, value); }
+        public bool IsAddProfileEnabled 
+        { 
+            get => _isAddProfileEnabled; 
+            set => SetProperty(ref _isAddProfileEnabled, value); 
+        }
 
         private bool _isCopyProfileEnabled;
-        public bool IsCopyProfileEnabled { get => _isCopyProfileEnabled; set => SetProperty(ref _isCopyProfileEnabled, value); }
+        public bool IsCopyProfileEnabled 
+        { 
+            get => _isCopyProfileEnabled; 
+            set => SetProperty(ref _isCopyProfileEnabled, value); 
+        }
 
         private bool _isEditProfileEnabled;
-        public bool IsEditProfileEnabled { get => _isEditProfileEnabled; set => SetProperty(ref _isEditProfileEnabled, value); }
+        public bool IsEditProfileEnabled 
+        { 
+            get => _isEditProfileEnabled; 
+            set => SetProperty(ref _isEditProfileEnabled, value); 
+        }
 
         private bool _isRemoveProfileEnabled;
-        public bool IsRemoveProfileEnabled { get => _isRemoveProfileEnabled; set => SetProperty(ref _isRemoveProfileEnabled, value); }
+        public bool IsRemoveProfileEnabled 
+        { 
+            get => _isRemoveProfileEnabled; 
+            set => SetProperty(ref _isRemoveProfileEnabled, value); 
+        }
 
         // ===== コマンド =====
         public ICommand ShownCommand { get; }
-        public ICommand ChangeParallelCountCommand { get; }
+
+        public ICommand ParallelCountUpCommand { get; }
+        public ICommand ParallelCountDownCommand { get; }
+
         public ICommand BrowseCommand { get; }
 
         public ICommand AddProfileCommand { get; }
@@ -168,7 +211,10 @@ namespace ezFFmpeg.ViewModels
             Result                      = new OptionDialogResult();
 
             ShownCommand                = new RelayCommand(OnShown);
-            ChangeParallelCountCommand  = new RelayCommand<string>(ChangeParallelCount);
+
+            ParallelCountUpCommand      = new RelayCommand(() => ChangeParallelCount(1));
+            ParallelCountDownCommand    = new RelayCommand(() => ChangeParallelCount(-1));
+
             BrowseCommand               = new RelayCommand(ShowFolderDialog);
             ApplyCommand                = new RelayCommand(Apply);
             CancelCommand               = new RelayCommand(Cancel);
@@ -206,12 +252,9 @@ namespace ezFFmpeg.ViewModels
         /// 並列数変更処理
         /// direction: "Up"で減少、"Down"で増加
         /// </summary>
-        private void ChangeParallelCount(string direction)
+        private void ChangeParallelCount(int direction)
         {
-            if (direction == "Up")
-                ParallelCount = Math.Max(ParallelCount - 1, ParallelMin);
-            else if (direction == "Down")
-                ParallelCount = Math.Min(ParallelCount + 1, ParallelMax);
+            ParallelCount = ParallelCount + direction;
         }
 
         /// <summary>
@@ -321,7 +364,6 @@ namespace ezFFmpeg.ViewModels
             // すべての入力が正しい場合
             return true;
         }
-
 
         /// <summary>
         /// 設定適用
