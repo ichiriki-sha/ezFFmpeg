@@ -495,7 +495,7 @@ namespace ezFFmpeg.ViewModels
         }
 
 
-        private void ShowResultMessage()
+        private void UpdateResultStatus()
         {
             var elapsed = DateTime.Now - _settings.ProcessStartTime;
             var elapsedFormatted = $"{elapsed:hh\\:mm\\:ss}";
@@ -505,22 +505,10 @@ namespace ezFFmpeg.ViewModels
             if (_cts?.IsCancellationRequested == true)
             {
                 StatusMessage = "処理はキャンセルされました。";
-
-                _dialogService.ShowMessageBox(
-                    StatusMessage,
-                    "中断",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
             }
             else
             {
                 StatusMessage = "処理が完了しました。";
-
-                _dialogService.ShowMessageBox(
-                    StatusMessage,
-                    "完了",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
             }
         }
 
@@ -600,7 +588,7 @@ namespace ezFFmpeg.ViewModels
                 UpdateToolboxButtonsState();
             }
 
-            ShowResultMessage();
+            UpdateResultStatus();
         }
 
         /// <summary>
@@ -732,6 +720,8 @@ namespace ezFFmpeg.ViewModels
 
             if (count > 0)
                 StatusMessage = $"アイテムを {count}個削除しました。";
+
+            Preview.MediaSource = null;
         }
 
         /// <summary>
@@ -744,6 +734,8 @@ namespace ezFFmpeg.ViewModels
 
             UpdateToolboxButtonsState();
             StatusMessage = "アイテムをクリアしました。";
+
+            Preview.MediaSource = null;
         }
 
         /// <summary>
@@ -801,7 +793,7 @@ namespace ezFFmpeg.ViewModels
                 0 or 1 => TimeSpan.FromHours(10 * duration),    // 時間10の位
                 2 or 3 => TimeSpan.FromHours(1 * duration),     // 時間1の位
                 4 => TimeSpan.FromMinutes(10 * duration),       // 分10の位
-                5 or  6 => TimeSpan.FromMinutes(1 * duration),  // 分1の位
+                5 or 6 => TimeSpan.FromMinutes(1 * duration),   // 分1の位
                 7 => TimeSpan.FromSeconds(10 * duration),       // 秒10の位
                 8 => TimeSpan.FromSeconds(1 * duration),        // 秒1の位
                 _ => TimeSpan.FromSeconds(0)

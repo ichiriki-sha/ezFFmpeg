@@ -42,6 +42,7 @@ namespace ezFFmpeg.Behaviors
         {
             AssociatedObject.MediaOpened += OnMediaOpened;
             AssociatedObject.MediaEnded += OnMediaEnded;
+            AssociatedObject.MediaFailed += OnMediaFailed;
             StartTimer();
             Attach(Preview);
         }
@@ -50,6 +51,8 @@ namespace ezFFmpeg.Behaviors
         {
             AssociatedObject.MediaOpened -= OnMediaOpened;
             AssociatedObject.MediaEnded -= OnMediaEnded;
+            AssociatedObject.MediaFailed -= OnMediaFailed;
+
             Attach(null);
         }
 
@@ -99,7 +102,6 @@ namespace ezFFmpeg.Behaviors
         private void OnMediaOpened(object? sender, RoutedEventArgs e)
         {
             _mediaOpened = true;
-            //Preview!.IsMediaOpened = true;  // ← 再生のタイミングでオープン済みにする
 
             if (AssociatedObject.NaturalDuration.HasTimeSpan)
                 Preview!.TotalSeconds =
@@ -115,8 +117,20 @@ namespace ezFFmpeg.Behaviors
 
         private void OnMediaEnded(object? sender, RoutedEventArgs e)
         {
+            _mediaOpened = false;
             Preview!.IsPlaying = false;
             AssociatedObject.Stop();
+        }
+
+        private void OnMediaFailed(object? sender, ExceptionRoutedEventArgs e)
+        {
+            _mediaOpened = false;
+            Preview!.IsMediaOpened = false;
+            Preview!.IsPlaying = false;
+            AssociatedObject.Stop();
+
+            Preview!.MediaErrorMessage = "この動画はプレビュー再生できません。\n" +
+                                         "（コーデックまたは形式が未対応です）";
         }
 
         private void StartTimer()

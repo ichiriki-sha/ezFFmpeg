@@ -686,7 +686,27 @@
                                         <b:MediaElementControlBehavior Preview="{Binding Preview}" />
                                     </i:Interaction.Behaviors>
                         </MediaElement>
-                        
+
+                        <!-- エラー表示 -->
+                        <Border Background="#AA000000"
+                                Visibility="{Binding Preview.MediaErrorMessage, 
+                                            Converter={StaticResource NullToVisibilityConverter}}">
+                            <StackPanel HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+                                <TextBlock Text="⚠ 再生できません。"
+                                           Foreground="White"
+                                           FontSize="20"
+                                           HorizontalAlignment="Center" />
+
+                                <TextBlock Text="{Binding Preview.MediaErrorMessage}"
+                                           Foreground="White"
+                                           FontSize="14"
+                                           HorizontalAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           MaxWidth="300" />
+                            </StackPanel>
+                        </Border>
+
                         <!-- ===== 再生コントロール（動画の上に重ねる） ===== -->
                         <Border VerticalAlignment="Bottom"
                                 HorizontalAlignment="Stretch"

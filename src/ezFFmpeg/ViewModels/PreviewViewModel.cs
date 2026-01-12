@@ -26,7 +26,12 @@ namespace ezFFmpeg.ViewModels
         public Uri? MediaSource
         {
             get => _mediaSource;
-            set => SetProperty(ref _mediaSource, value);
+            set
+            {
+                SetProperty(ref _mediaSource, value);
+                if (MediaSource == null)
+                    MediaErrorMessage = null;
+            }
         }
 
         private bool _isMediaOpened;
@@ -93,6 +98,12 @@ namespace ezFFmpeg.ViewModels
                 ? new BitmapImage(new Uri("pack://application:,,,/Resources/Images/Pause.png"))
                 : new BitmapImage(new Uri("pack://application:,,,/Resources/Images/Play.png"));
 
+        private string? _mediaErrorMessage;
+        public string? MediaErrorMessage
+        {
+            get => _mediaErrorMessage;
+            set => SetProperty(ref _mediaErrorMessage, value);
+        }
 
         public ICommand TogglePlayPauseCommand { get; }
 
@@ -126,6 +137,7 @@ namespace ezFFmpeg.ViewModels
             CurrentSeconds = 0;
             CurrentTimeText = "00:00:00";
             TotalSeconds = item.VideoDuration.TotalSeconds;
+            MediaErrorMessage = null;
         }
 
         private void Play() => PlayRequested?.Invoke();
