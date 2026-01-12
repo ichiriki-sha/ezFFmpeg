@@ -26,14 +26,14 @@ namespace ezFFmpeg.Models.Output
         internal static readonly (string Tag, string Name) AudioCodec = ("acodec", "オーディオコーデック");
 
         /// <summary>
-        /// ビデオ解像度を表すタグ
-        /// </summary>
-        internal static readonly (string Tag, string Name) VideoResolution = ("resolution", "解像度");
-
-        /// <summary>
         /// ビデオ品質レベルを表すタグ
         /// </summary>
         internal static readonly (string Tag, string Name) VideoQuality = ("quality", "品質レベル");
+
+        /// <summary>
+        /// ビデオ解像度を表すタグ
+        /// </summary>
+        internal static readonly (string Tag, string Name) VideoResolution = ("resolution", "解像度");
 
         /// <summary>
         /// 出力日時などのタイムスタンプを表すタグ
@@ -46,7 +46,7 @@ namespace ezFFmpeg.Models.Output
         /// </summary>
         internal static readonly (string Tag, string Name)[] All =
         [
-            FileName, VideoCodec, AudioCodec, VideoResolution, TimeStamp
+            FileName, VideoCodec, AudioCodec, VideoQuality, VideoResolution, TimeStamp
         ];
     }
 }

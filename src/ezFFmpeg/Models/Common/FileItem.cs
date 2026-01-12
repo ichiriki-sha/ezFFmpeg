@@ -54,6 +54,8 @@ namespace ezFFmpeg.Models.Common
 
         public string VideoCodec { get; set; }
         public TimeSpan VideoDuration { get; set; }
+        public string VideoDurationText { get => VideoDuration.ToString(@"hh\:mm\:ss\.fff"); }
+
         public string VideoResolution { get; set; }
         public Size VideoResolutionSize { get; set; }
         public string VideoAspectRatio { get; set; }
@@ -86,7 +88,7 @@ namespace ezFFmpeg.Models.Common
 
         public string DurationInfo 
         {
-            get => $"{UiIcons.Time}{VideoDuration:hh\\:mm\\:ss}";
+            get => $"{UiIcons.Time}{VideoDurationText}";
         }
 
         public string VideoInfo
@@ -197,7 +199,7 @@ namespace ezFFmpeg.Models.Common
             set 
             {
                 value = value < TimeSpan.Zero ? TimeSpan.Zero : value;
-                value = value > VideoDuration ? VideoDuration : value;
+                value = value > EndPosition ? EndPosition : value;
                 if (SetProperty(ref _startPosition, value))
                     RaisePropertyChanged(nameof(StartPositionText));
             }
@@ -208,7 +210,7 @@ namespace ezFFmpeg.Models.Common
         /// </summary>
         public string StartPositionText
         {
-            get => StartPosition.ToString(@"hh\:mm\:ss");
+            get => StartPosition.ToString(@"hh\:mm\:ss\.fff");
             set
             {
                 if (TimeSpan.TryParse(value, out var ts))
@@ -219,11 +221,47 @@ namespace ezFFmpeg.Models.Common
             }
         }
 
-        private int _startPositionCaretIndex = 8;
+        private int _startPositionCaretIndex;
         public int StartPositionCaretIndex
         {
             get => _startPositionCaretIndex;
             set => SetProperty(ref _startPositionCaretIndex, value);
+        }
+
+        private TimeSpan _endPosition ;
+        public TimeSpan EndPosition
+        {
+            get => _endPosition;
+            set
+            {
+                value = value < StartPosition ? StartPosition : value;
+                value = value > VideoDuration ? VideoDuration : value;
+                if (SetProperty(ref _endPosition, value))
+                    RaisePropertyChanged(nameof(EndPositionText));
+            }
+        }
+
+        /// <summary>
+        /// TextBox 表示用 (hh:mm:ss)
+        /// </summary>
+        public string EndPositionText
+        {
+            get => EndPosition.ToString(@"hh\:mm\:ss\.fff");
+            set
+            {
+                if (TimeSpan.TryParse(value, out var ts))
+                {
+                    EndPosition = ts;
+                }
+                // 失敗時は何もしない
+            }
+        }
+
+        private int _endPositionCaretIndex ;
+        public int EndPositionCaretIndex
+        {
+            get => _endPositionCaretIndex;
+            set => SetProperty(ref _endPositionCaretIndex, value);
         }
 
         /// <summary>
@@ -249,7 +287,7 @@ namespace ezFFmpeg.Models.Common
             VideoFrameRate = string.Empty;
             MediaInfo = null!;
             StartPosition = TimeSpan.Zero;
-
+            EndPosition   = TimeSpan.Zero;
         }
 
         /// <summary>
@@ -302,6 +340,10 @@ namespace ezFFmpeg.Models.Common
             Progress = 0;
             Status = ProcessingStatus.Pending;
 
+            StartPosition = TimeSpan.Zero;
+            StartPositionCaretIndex　= 12;
+            EndPosition = info.Video.Duration;
+            EndPositionCaretIndex = 12;
         }
     }
 }

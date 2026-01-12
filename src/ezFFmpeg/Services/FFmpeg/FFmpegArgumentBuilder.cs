@@ -83,13 +83,20 @@ namespace ezFFmpeg.Services.FFmpeg
             sb.Append("-hide_banner ");
 
 
-            // ★ 変換開始時間（入力シーク）
+            // ★ 変換開始時間
             if (item.StartPosition > TimeSpan.Zero)
             {
                 var startrTime = item.StartPosition.ToString(@"hh\:mm\:ss\.fff");
                 sb.Append($"-ss {startrTime} ");
             }
 
+            // ★ 変換終了時間
+            if (item.EndPosition < item.VideoDuration)
+            {
+                var endTime = item.EndPosition.ToString(@"hh\:mm\:ss\.fff");
+                sb.Append($"-to {endTime} ");
+            }
+            
             // 入力ファイル
             sb.Append($"-i \"{item.FilePath}\" ");
 

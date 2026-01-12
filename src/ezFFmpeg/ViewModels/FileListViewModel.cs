@@ -100,13 +100,19 @@ namespace ezFFmpeg.ViewModels
                     }
                 }
 
-                firstItem?.IsSelected = true;
+                if (firstItem != null)
+                {
+
+                    firstItem?.IsSelected = true;
+
+                    foreach (var item in Items)
+                        item.IsSelected = false;
+
+                    SelectedItem = firstItem;
+                }
 
                 foreach (var item in items)
                     Items.Add(item);
-
-                if (firstItem != null)
-                    SelectedItem = firstItem;
 
                 // サムネイル読み込み
                 _ = LoadThumbnailsAsync(items);

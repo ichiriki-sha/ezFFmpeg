@@ -324,6 +324,8 @@ namespace ezFFmpeg.ViewModels
         // StartPotion 
         public ICommand FileItemStartPositionUpCommand { get; }
         public ICommand FileItemStartPositionDownCommand { get; }
+        public ICommand FileItemEndPositionUpCommand { get; }
+        public ICommand FileItemEndPositionDownCommand { get; }
 
         // FileListViewItem
         public ICommand FileItemCheckedCommand { get; }
@@ -391,6 +393,9 @@ namespace ezFFmpeg.ViewModels
 
             FileItemStartPositionUpCommand          = new RelayCommand(() => ChangeFileItemStartPosition(1));
             FileItemStartPositionDownCommand        = new RelayCommand(() => ChangeFileItemStartPosition(-1));
+
+            FileItemEndPositionUpCommand            = new RelayCommand(() => ChangeFileItemEndPosition(1));
+            FileItemEndPositionDownCommand          = new RelayCommand(() => ChangeFileItemEndPosition(-1));
 
             // Help & Exit
             AboutCommand                            = new RelayCommand(ShowAbout);
@@ -781,6 +786,24 @@ namespace ezFFmpeg.ViewModels
             UpdateToolboxButtonsState();
         }
 
+
+        private static TimeSpan CalculateDelta(int caretIndex, int duration)
+        {
+            return caretIndex switch
+            {
+                0 or 1 => TimeSpan.FromHours(10 * duration),        // 時間10の位
+                2 or 3 => TimeSpan.FromHours(1 * duration),         // 時間1の位
+                4 => TimeSpan.FromMinutes(10 * duration),           // 分10の位
+                5 or 6 => TimeSpan.FromMinutes(1 * duration),       // 分1の位
+                7 => TimeSpan.FromSeconds(10 * duration),           // 秒10の位
+                8 or 9 => TimeSpan.FromSeconds(1 * duration),       // 秒1の位
+                10 => TimeSpan.FromMilliseconds(100 * duration),    // ミリ秒100の位
+                11 => TimeSpan.FromMilliseconds(10 * duration),     // ミリ秒10の位
+                12 => TimeSpan.FromMilliseconds(1 * duration),      // ミリ秒1の位
+                _ => TimeSpan.Zero
+            };
+        }
+
         /// <summary>
         /// 変換開始時間を増減する。
         /// </summary>
@@ -788,23 +811,25 @@ namespace ezFFmpeg.ViewModels
         {
             if (SelectedFileItem == null) return;
 
-            TimeSpan delta = SelectedFileItem.StartPositionCaretIndex switch
-            {
-                0 or 1 => TimeSpan.FromHours(10 * duration),    // 時間10の位
-                2 or 3 => TimeSpan.FromHours(1 * duration),     // 時間1の位
-                4 => TimeSpan.FromMinutes(10 * duration),       // 分10の位
-                5 or 6 => TimeSpan.FromMinutes(1 * duration),   // 分1の位
-                7 => TimeSpan.FromSeconds(10 * duration),       // 秒10の位
-                8 => TimeSpan.FromSeconds(1 * duration),        // 秒1の位
-                _ => TimeSpan.FromSeconds(0)
-            };
+            var delta = CalculateDelta(SelectedFileItem.StartPositionCaretIndex, duration);
 
             TimeSpan ts = SelectedFileItem.StartPosition.Add(delta);
 
-            //if (ts < TimeSpan.Zero || ts > SelectedFileItem.VideoDuration)
-            //    return;
-
             SelectedFileItem.StartPosition = ts;
+        }
+
+        /// <summary>
+        /// 変換終了時間を増減する。
+        /// </summary>
+        private void ChangeFileItemEndPosition(int duration)
+        {
+            if (SelectedFileItem == null) return;
+
+            var delta = CalculateDelta(SelectedFileItem.EndPositionCaretIndex, duration);
+
+            TimeSpan ts = SelectedFileItem.EndPosition.Add(delta);
+
+            SelectedFileItem.EndPosition = ts;
         }
 
         /// <summary>

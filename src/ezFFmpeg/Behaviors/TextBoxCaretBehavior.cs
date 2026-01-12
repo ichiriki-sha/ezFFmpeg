@@ -17,6 +17,51 @@ namespace ezFFmpeg.Behaviors
     /// </summary>
     public static class TextBoxCaretBehavior
     {
+
+        public enum CaretTarget
+        {
+            Start,
+            End
+        }
+
+
+        public static readonly DependencyProperty CaretTargetProperty =
+                    DependencyProperty.RegisterAttached(
+                        "CaretTarget",
+                        typeof(CaretTarget),
+                        typeof(TextBoxCaretBehavior),
+                        new PropertyMetadata(CaretTarget.Start));
+
+        public static void SetCaretTarget(DependencyObject obj, CaretTarget value)
+            => obj.SetValue(CaretTargetProperty, value);
+
+        public static CaretTarget GetCaretTarget(DependencyObject obj)
+            => (CaretTarget)obj.GetValue(CaretTargetProperty);
+
+
+        private static int GetCaretIndex(FileItem item, CaretTarget target)
+        {
+            return target switch
+            {
+                CaretTarget.Start => item.StartPositionCaretIndex,
+                CaretTarget.End => item.EndPositionCaretIndex,
+                _ => 0
+            };
+        }
+
+        private static void SetCaretIndex(FileItem item, CaretTarget target, int value)
+        {
+            switch (target)
+            {
+                case CaretTarget.Start:
+                    item.StartPositionCaretIndex = value;
+                    break;
+                case CaretTarget.End:
+                    item.EndPositionCaretIndex = value;
+                    break;
+            }
+        }
+
         // =========================================================
         // 内部フラグ：Text 更新中かどうか
         // =========================================================
@@ -89,12 +134,41 @@ namespace ezFFmpeg.Behaviors
             {
                 tb.TextChanged += OnTextChanged;
                 tb.SelectionChanged += OnSelectionChanged;
+                tb.Loaded += OnTextBoxLoaded;
             }
             else
             {
                 tb.TextChanged -= OnTextChanged;
                 tb.SelectionChanged -= OnSelectionChanged;
+                tb.Loaded -= OnTextBoxLoaded;
             }
+        }
+
+        private static void OnTextBoxLoaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is not TextBox tb)
+                return;
+
+            RestoreInitialCaret(tb);
+        }
+
+        private static void RestoreInitialCaret(TextBox tb)
+        {
+            tb.Dispatcher.BeginInvoke(
+                DispatcherPriority.Render,
+                new Action(() =>
+                {
+                    if (tb.DataContext is not FileItem item)
+                        return;
+
+                    var target = GetCaretTarget(tb);
+                    int caret = GetCaretIndex(item, target);
+
+                    if (caret <= tb.Text.Length)
+                    {
+                        tb.CaretIndex = caret;
+                    }
+                }));
         }
 
         // =========================================================
@@ -112,24 +186,23 @@ namespace ezFFmpeg.Behaviors
             if (sender is not TextBox tb)
                 return;
 
-            // Text変更中フラグON
             SetIsTextUpdating(tb, true);
 
             tb.Dispatcher.BeginInvoke(
                 DispatcherPriority.Render,
                 new Action(() =>
                 {
-                    // TextChanged 後の Caret 移動を無効化
                     if (tb.DataContext is FileItem item)
                     {
-                        int caret = item.StartPositionCaretIndex;
+                        var target = GetCaretTarget(tb);
+                        int caret = GetCaretIndex(item, target);
+
                         if (caret <= tb.Text.Length)
                         {
                             tb.CaretIndex = caret;
                         }
                     }
 
-                    // フラグ解除
                     SetIsTextUpdating(tb, false);
                 }));
         }
@@ -152,12 +225,13 @@ namespace ezFFmpeg.Behaviors
             if (tb.DataContext is not FileItem item)
                 return;
 
-            // Text変更由来なら保存しない
             if (GetIsTextUpdating(tb))
                 return;
 
-            // ユーザー操作 → 保存
-            item.StartPositionCaretIndex = tb.CaretIndex;
+            var target = GetCaretTarget(tb);
+            SetCaretIndex(item, target, tb.CaretIndex);
         }
+
+
     }
 }

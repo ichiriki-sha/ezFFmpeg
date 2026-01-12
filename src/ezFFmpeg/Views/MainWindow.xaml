@@ -453,11 +453,11 @@
                                         <!-- ファイル名 -->
                                         <RowDefinition Height="25"/>
                                         <!-- ファイル情報 -->
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="22"/>
                                         <!-- メディア情報 -->
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="24"/>
                                         <!-- その他  -->
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="22"/>
                                     </Grid.RowDefinitions>
 
                                     <!-- 1段目：ファイル名 -->
@@ -480,7 +480,7 @@
 
                                     <!-- 3段目：メディア情報 -->
                                     <StackPanel Grid.Row="2"
-                                                Margin="8 0"
+                                                Margin="8 0 0 4"
                                                 Orientation="Horizontal"
                                                 VerticalAlignment="Center">
                                         <TextBlock Text="{Binding DurationInfo}" Margin="0 0" Foreground="#666"/>
@@ -495,6 +495,9 @@
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         
                                         <Grid.RowDefinitions>
@@ -506,21 +509,29 @@
                                                    Grid.Row="0"
                                                    Grid.RowSpan="2"
                                                    VerticalAlignment="Center" 
-                                                   Text="▸変換開始" 
-                                                   Margin="4 0" 
-                                                   Foreground="#000" />
+                                                   Text="✂" 
+                                                   FontWeight="Bold"
+                                                   Margin="4 6 0 0" 
+                                                   Foreground="#000" >
+                                            <TextBlock.RenderTransform>
+                                                <RotateTransform Angle="-45"/>
+                                            </TextBlock.RenderTransform>
+                                        </TextBlock>
 
                                         <TextBox x:Name="StartPositionTextBox"
                                                  Grid.Column="1" 
                                                  Grid.Row="0"
                                                  Grid.RowSpan="2"
-                                                 Width="54"
+                                                 Width="72"
+                                                 Margin="8 0 0 0" 
                                                  HorizontalAlignment="Right" 
                                                  Text="{Binding StartPositionText,
                                                         UpdateSourceTrigger=PropertyChanged}"
                                                  IsReadOnly="{Binding DataContext.IsReadOnly,
                                                         RelativeSource={RelativeSource AncestorType=ListView}}"
-                                                 b:TextBoxCaretBehavior.EnableCaretTracking="True">
+                                                 b:TextBoxCaretBehavior.EnableCaretTracking="True"
+                                                 b:TextBoxCaretBehavior.CaretTarget="Start"
+                                                 b:ListViewAutoSelectBehavior.EnableAutoSelect="True">
 
                                             <TextBox.Style>
                                                 <Style TargetType="TextBox">
@@ -557,7 +568,8 @@
                                                       IsEnabled="{Binding DataContext.IsReadOnly,
                                                                 RelativeSource={RelativeSource AncestorType=ListView},
                                                                 Converter={StaticResource InverseBoolConverter}}"
-                                                      b:FocusTargetBehavior.FocusTarget="{Binding ElementName=StartPositionTextBox}">
+                                                      b:FocusTargetBehavior.FocusTarget="{Binding ElementName=StartPositionTextBox}"
+                                                      b:ListViewAutoSelectBehavior.EnableAutoSelect="True">
                                             
                                             <Image Source="pack://application:,,,/Resources/Images/Up.png"
                                                    Width="16"
@@ -576,12 +588,98 @@
                                                       IsEnabled="{Binding DataContext.IsReadOnly,
                                                                 RelativeSource={RelativeSource AncestorType=ListView},
                                                                 Converter={StaticResource InverseBoolConverter}}"
-                                                      b:FocusTargetBehavior.FocusTarget="{Binding ElementName=StartPositionTextBox}">
+                                                      b:FocusTargetBehavior.FocusTarget="{Binding ElementName=StartPositionTextBox}"
+                                                      b:ListViewAutoSelectBehavior.EnableAutoSelect="True">
 
                                             <Image Source="pack://application:,,,/Resources/Images/Down.png"
                                                    Width="16"
                                                    Height="6"/>
                                         </RepeatButton>
+
+                                        <TextBlock Grid.Column="3"
+                                                   Grid.Row="0"
+                                                   Grid.RowSpan="2"
+                                                   Margin="8 0 8 0" 
+                                                   Text="－"
+                                                   VerticalAlignment="Center"/>
+
+                                        <TextBox x:Name="EndPositionTextBox"
+                                                 Grid.Column="4" 
+                                                 Grid.Row="0"
+                                                 Grid.RowSpan="2"
+                                                 Width="72"
+                                                 Margin="4 0 0 0" 
+                                                 HorizontalAlignment="Right" 
+                                                 Text="{Binding EndPositionText,
+                                                        UpdateSourceTrigger=PropertyChanged}"
+                                                 IsReadOnly="{Binding DataContext.IsReadOnly,
+                                                        RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                 b:TextBoxCaretBehavior.EnableCaretTracking="True"
+                                                 b:TextBoxCaretBehavior.CaretTarget="End"
+                                                 b:ListViewAutoSelectBehavior.EnableAutoSelect="True">
+
+                                            <TextBox.Style>
+                                                <Style TargetType="TextBox">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsReadOnly" Value="True">
+                                                            <Setter Property="Background" Value="#EEE"/>
+                                                            <Setter Property="Foreground" Value="#888"/>
+                                                            <Setter Property="BorderBrush" Value="#AAA"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBox.Style>
+
+                                            <TextBox.InputBindings>
+                                                <KeyBinding Key="Up"
+                                                            Command="{Binding DataContext.FileItemEndPositionUpCommand,
+                                                                                RelativeSource={RelativeSource AncestorType=ListView}}"/>
+                                                <KeyBinding Key="Down"
+                                                            Command="{Binding DataContext.FileItemEndPositionDownCommand,
+                                                                              RelativeSource={RelativeSource AncestorType=ListView}}"/>
+                                            </TextBox.InputBindings>
+                                        </TextBox>
+
+                                        <RepeatButton Grid.Column="5"
+                                                      Grid.Row="0"
+                                                      BorderBrush="LightGray"
+                                                      BorderThickness="1"
+                                                      Delay="400"
+                                                      Interval="100"
+                                                      Focusable="False"
+                                                      Command="{Binding DataContext.FileItemEndPositionUpCommand, 
+                                                                RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                      IsEnabled="{Binding DataContext.IsReadOnly,
+                                                                RelativeSource={RelativeSource AncestorType=ListView},
+                                                                Converter={StaticResource InverseBoolConverter}}"
+                                                      b:FocusTargetBehavior.FocusTarget="{Binding ElementName=EndPositionTextBox}"
+                                                      b:ListViewAutoSelectBehavior.EnableAutoSelect="True">
+
+                                            <Image Source="pack://application:,,,/Resources/Images/Up.png"
+                                                   Width="16"
+                                                   Height="6"/>
+                                        </RepeatButton>
+
+                                        <RepeatButton Grid.Column="5"
+                                                      Grid.Row="1"
+                                                      BorderBrush="LightGray"
+                                                      BorderThickness="1"
+                                                      Delay="400"
+                                                      Interval="100"
+                                                      Focusable="False"
+                                                      Command="{Binding DataContext.FileItemEndPositionDownCommand, 
+                                                                RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                      IsEnabled="{Binding DataContext.IsReadOnly,
+                                                                RelativeSource={RelativeSource AncestorType=ListView},
+                                                                Converter={StaticResource InverseBoolConverter}}"
+                                                      b:FocusTargetBehavior.FocusTarget="{Binding ElementName=EndPositionTextBox}"
+                                                      b:ListViewAutoSelectBehavior.EnableAutoSelect="True">
+
+                                            <Image Source="pack://application:,,,/Resources/Images/Down.png"
+                                                   Width="16"
+                                                   Height="6"/>
+                                        </RepeatButton>
+
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -960,7 +1058,7 @@
 
                                     <TextBlock Grid.Column="1"
                                                Grid.Row="3"
-                                               Text="{Binding SelectedFileItem.VideoDuration, Converter={StaticResource TimeSpanToStringConverter}}" 
+                                               Text="{Binding SelectedFileItem.VideoDurationText}" 
                                                TextAlignment="Right"/>
 
                                     <!-- セパレータ -->
