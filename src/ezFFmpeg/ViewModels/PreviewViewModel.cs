@@ -106,10 +106,22 @@ namespace ezFFmpeg.ViewModels
         }
 
         public ICommand TogglePlayPauseCommand { get; }
+        public ICommand PlayCommand { get; }
+        public ICommand PauseCommand { get; }
+        public ICommand SeekToBeginningCommand { get; }
+        public ICommand SetStartPositionCommand { get; }
+        public ICommand SetEndPositionCommand { get; }
+
+        private FileItem? _item;
 
         public PreviewViewModel()
         {
             TogglePlayPauseCommand = new RelayCommand(TogglePlayPause);
+            PlayCommand = new RelayCommand(Play);
+            PauseCommand = new RelayCommand(Pause);
+            SeekToBeginningCommand = new RelayCommand(SeekToBeginning);
+            SetStartPositionCommand = new RelayCommand(SetStartPositionFromCurrentTime);
+            SetEndPositionCommand = new RelayCommand(SetEndPositionFromCurrentTime);
         }
 
         // ------------------------
@@ -121,11 +133,15 @@ namespace ezFFmpeg.ViewModels
             // 再生中のみ停止
             if (IsPlaying)
             {
-                PauseRequested?.Invoke();
+                Pause();
             }
 
             IsPlaying = false;
             IsMediaOpened = false;
+            CurrentSeconds = 0;
+            CurrentTimeText = "00:00:00.000";
+            MediaErrorMessage = null;
+            _item = item;
 
             if (item == null || !File.Exists(item.FilePath))
             {
@@ -134,14 +150,17 @@ namespace ezFFmpeg.ViewModels
             }
 
             MediaSource = new Uri(item.FilePath);
-            CurrentSeconds = 0;
-            CurrentTimeText = "00:00:00.000";
             TotalSeconds = item.VideoDuration.TotalSeconds;
-            MediaErrorMessage = null;
         }
 
         private void Play() => PlayRequested?.Invoke();
         private void Pause() => PauseRequested?.Invoke();
+        private void SeekToBeginning() => 
+                            CurrentSeconds = 0;
+        private void SetStartPositionFromCurrentTime() => 
+                            _item!.StartPosition = TimeSpan.FromSeconds(CurrentSeconds);
+        private void SetEndPositionFromCurrentTime() => 
+                            _item!.EndPosition = TimeSpan.FromSeconds(CurrentSeconds);
 
         public void TogglePlayPause()
         {

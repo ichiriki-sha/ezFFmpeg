@@ -812,6 +812,25 @@
                                 Padding="6"
                                 Opacity="0">
 
+                            <!-- ★ 右クリックメニュー -->
+                            <Border.ContextMenu>
+                                <ContextMenu x:Name="PreviewContextMenu">
+
+                                    <MenuItem Header="再生(P_)"
+                                        Command="{Binding Preview.PlayCommand}" />
+                                    <MenuItem Header="一時停止(A_)"
+                                        Command="{Binding Preview.PauseCommand}" />
+                                    <Separator/>
+                                    <MenuItem Header="先頭に戻す(B_)"
+                                        Command="{Binding Preview.SeekToBeginningCommand}" />
+                                    <Separator/>
+                                    <MenuItem Header="開始位置に設定(S_)"
+                                        Command="{Binding Preview.SetStartPositionCommand}" />
+                                    <MenuItem Header="終了位置に設定(E_)"
+                                        Command="{Binding Preview.SetEndPositionCommand}" />
+                                </ContextMenu>
+                            </Border.ContextMenu>
+
                             <Border.RenderTransform>
                                 <TranslateTransform Y="10"/>
                             </Border.RenderTransform>
@@ -825,19 +844,12 @@
                                     <Setter Property="IsHitTestVisible" Value="False"/>
 
                                     <Style.Triggers>
-
                                         <MultiDataTrigger>
                                             <MultiDataTrigger.Conditions>
-
-                                                <!-- プレビューエリアにマウス -->
-                                                <Condition Binding="{Binding IsMouseOver, ElementName=VideoArea}"
-                                                           Value="True"/>
-
                                                 <!-- MediaSource != null -->
                                                 <Condition Binding="{Binding Preview.MediaSource,
                                                            Converter={StaticResource NullToBoolConverter}}"
                                                            Value="True"/>
-
                                             </MultiDataTrigger.Conditions>
 
                                             <!-- ★ 表示中は常に操作可能 -->
@@ -872,9 +884,7 @@
                                                     </Storyboard>
                                                 </BeginStoryboard>
                                             </MultiDataTrigger.ExitActions>
-
                                         </MultiDataTrigger>
-
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>
