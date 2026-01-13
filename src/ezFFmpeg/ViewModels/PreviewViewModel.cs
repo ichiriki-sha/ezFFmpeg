@@ -61,8 +61,8 @@ namespace ezFFmpeg.ViewModels
                 if (SetProperty(ref _currentSeconds, value))
                 {
                     CurrentTimeText = IsMediaOpened
-                        ? TimeSpan.FromSeconds(value).ToString(@"hh\:mm\:ss")
-                        : "--:--:--";
+                        ? TimeSpan.FromSeconds(value).ToString(@"hh\:mm\:ss\.fff")
+                        : "00:00:00.000";
 
                     if (IsSeeking)
                     {
@@ -72,7 +72,7 @@ namespace ezFFmpeg.ViewModels
             }
         }
 
-        private string _currentTimeText = "--:--:--";
+        private string _currentTimeText = "00:00:00.000";
         public string CurrentTimeText
         {
             get => _currentTimeText;
@@ -135,7 +135,7 @@ namespace ezFFmpeg.ViewModels
 
             MediaSource = new Uri(item.FilePath);
             CurrentSeconds = 0;
-            CurrentTimeText = "00:00:00";
+            CurrentTimeText = "00:00:00.000";
             TotalSeconds = item.VideoDuration.TotalSeconds;
             MediaErrorMessage = null;
         }
