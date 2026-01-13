@@ -914,7 +914,7 @@
                                            Text="{Binding Preview.CurrentTimeText}"
                                            VerticalAlignment="Center"
                                            Foreground="White" 
-                                           Margin="8,0"/>
+                                           Margin="4,0"/>
 
                                 <!-- シークバー -->
                                 <Slider Grid.Column="2"
@@ -923,7 +923,7 @@
                                         Value="{Binding Preview.CurrentSeconds, Mode=TwoWay}"
                                         IsMoveToPointEnabled="True"
                                         VerticalAlignment="Center"
-                                        Margin="8,0,0,0">
+                                        Margin="4,0,0,0">
 
                                     <i:Interaction.Behaviors>
                                         <b:SliderSeekBehavior Preview="{Binding Preview}" />
