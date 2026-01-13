@@ -82,6 +82,7 @@ namespace ezFFmpeg.Behaviors
                 return;
             }
 
+            _timer!.Start();
             AssociatedObject.Play();
             Preview!.IsPlaying = true;
             Preview!.IsMediaOpened = true;        // プレイのタイミングでオープン済みにする
@@ -89,6 +90,7 @@ namespace ezFFmpeg.Behaviors
 
         private void Pause()
         {
+            _timer!.Stop();
             AssociatedObject.Pause();
             Preview!.IsPlaying = false;
         }
@@ -96,7 +98,15 @@ namespace ezFFmpeg.Behaviors
         private void Seek(double seconds)
         {
             if (_mediaOpened)
+            {
                 AssociatedObject.Position = TimeSpan.FromSeconds(seconds);
+
+                if (!Preview!.IsPlaying)
+                {
+                    Play();
+                    Pause();
+                }
+            }
         }
 
         private void OnMediaOpened(object? sender, RoutedEventArgs e)
@@ -137,7 +147,7 @@ namespace ezFFmpeg.Behaviors
         {
             _timer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromMilliseconds(200)
+                Interval = TimeSpan.FromMilliseconds(50)
             };
             _timer.Tick += (_, _) =>
             {
