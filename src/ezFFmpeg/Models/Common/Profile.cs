@@ -193,7 +193,7 @@ namespace ezFFmpeg.Models.Common
         {
             _profileId = Guid.NewGuid();
             _outputFormat = OutputFormats.Mp4.Extension;
-            _outputFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
+            _outputFolderPath = AppPath.GetOutputFolderPath();
             _outputFileFormat = $"{{{OutputFileTags.FileName.Tag}}}_{{{OutputFileTags.VideoCodec.Tag}}}_{{{OutputFileTags.AudioCodec.Tag}}}";
             _isOutputOverwrite = true;
 

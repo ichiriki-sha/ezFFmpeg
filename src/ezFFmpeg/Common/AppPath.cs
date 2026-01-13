@@ -1,6 +1,7 @@
 ﻿using ezFFmpeg.Services.FFmpeg;
 using System;
 using System.IO;
+using System.Windows.Controls;
 
 namespace ezFFmpeg.Common
 {
@@ -72,5 +73,15 @@ namespace ezFFmpeg.Common
             var guid = Guid.NewGuid();
             return Path.Combine(GetAppWorkFolderPath(), guid.ToString() + extension);
         }
+
+        /// <summary>
+        /// デフォルトのファイル出力用フォルダパスを取得する。
+        /// </summary>
+        public static string GetOutputFolderPath() 
+        {
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
+            return Path.Combine(path, AppInfo.AppName);
+        }
+
     }
 }

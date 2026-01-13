@@ -61,6 +61,9 @@ namespace ezFFmpeg
             if (!Directory.Exists(setting.WorkFolderPath))
                 Directory.CreateDirectory(setting.WorkFolderPath);
 
+            if (!Directory.Exists(AppPath.GetOutputFolderPath()))
+                Directory.CreateDirectory(AppPath.GetOutputFolderPath());
+
             // FFmpegフォルダが未設定、または無効な場合は設定ダイアログを表示
             if (string.IsNullOrWhiteSpace(setting.FFmpegFolderPath) ||
                !FFmpegPathService.IsFFmpegFolder(setting.FFmpegFolderPath))
