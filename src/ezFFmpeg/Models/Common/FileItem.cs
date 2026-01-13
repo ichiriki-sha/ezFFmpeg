@@ -46,7 +46,7 @@ namespace ezFFmpeg.Models.Common
         public string? FolderName { get; set; }
 
         /// <summary>ファイルアイコン</summary>
-        public ImageSource FileIcon { get; set; }
+        public ImageSource? FileIcon { get; set; }
 
         // --------------------
         // ビデオ情報
@@ -275,17 +275,27 @@ namespace ezFFmpeg.Models.Common
         /// </summary>
         public FileItem()
         {
+
+            // ---- ファイル情報 ----
             FileName = string.Empty;
             FilePath = string.Empty;
             FileType = string.Empty;
             FileSize = string.Empty;
-            FileIcon = BitmapFrame.Create(new Uri("pack://application:,,,/Resources/Images/File.png"));
+            FileIcon = null;
+
+            // ---- ビデオ情報 ----
             VideoCodec = string.Empty;
             VideoResolution = string.Empty;
             VideoAspectRatio = string.Empty;
             VideoBitRate = string.Empty;
             VideoFrameRate = string.Empty;
+
+            // ---- メディア情報 ----
             MediaInfo = null!;
+
+            // ---- 状態初期化 ----
+            Status = ProcessingStatus.Pending;
+            Progress = 0;
             StartPosition = TimeSpan.Zero;
             EndPosition   = TimeSpan.Zero;
         }
@@ -296,6 +306,7 @@ namespace ezFFmpeg.Models.Common
         /// </summary>
         /// <param name="info">初期化に使用する MediaInfo オブジェクト</param>
         public FileItem(MediaInfo info)
+            : this()
         {
             if (info.Video == null)
                 throw new ArgumentException("Video情報がありません", nameof(info));
@@ -303,6 +314,7 @@ namespace ezFFmpeg.Models.Common
             var fi = new FileInfo(info.FilePath);
             var ext = Path.GetExtension(info.FilePath).ToLowerInvariant();
 
+            // ---- メディア情報 ----
             MediaInfo = info;
 
             // ---- ファイル情報 ----
