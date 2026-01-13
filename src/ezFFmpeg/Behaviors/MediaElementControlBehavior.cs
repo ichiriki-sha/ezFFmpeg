@@ -117,7 +117,7 @@ namespace ezFFmpeg.Behaviors
 
         private void OnMediaEnded(object? sender, RoutedEventArgs e)
         {
-            _mediaOpened = false;
+            //_mediaOpened = false;
             Preview!.IsPlaying = false;
             AssociatedObject.Stop();
         }
