@@ -688,7 +688,8 @@ namespace ezFFmpeg.ViewModels
         /// </summary>
         private void AddItemFromFileDialog()
         {
-            AddItem(_dialogService.ShowFileDialog());
+            var files = _dialogService.ShowFileDialog();
+            if (files.Count > 0)  { AddItem(files); }
         }
 
         /// <summary>
@@ -791,7 +792,7 @@ namespace ezFFmpeg.ViewModels
         {
             return caretIndex switch
             {
-                1 => TimeSpan.FromHours(10 * duration),         // 時間10の位
+                1 => TimeSpan.FromHours(10 * duration),             // 時間10の位
                 2 or 3 => TimeSpan.FromHours(1 * duration),         // 時間1の位
                 4 => TimeSpan.FromMinutes(10 * duration),           // 分10の位
                 5 or 6 => TimeSpan.FromMinutes(1 * duration),       // 分1の位
