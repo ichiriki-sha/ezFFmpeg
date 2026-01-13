@@ -9,12 +9,13 @@
     <ApplicationIcon>Resources\images\AppIcon.ico</ApplicationIcon>
     <StartupObject>ezFFmpeg.App</StartupObject>
     <Copyright>ichiriki-sha</Copyright>
-    <AssemblyVersion>0.9.5.0</AssemblyVersion>
-    <FileVersion>0.9.5.0</FileVersion>
+    <AssemblyVersion>0.9.6.0</AssemblyVersion>
+    <FileVersion>0.9.6.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Behaviors\CaretIndexBehavior.cs" />
+    <Compile Remove="Behaviors\ContextMenuStateBehavior.cs" />
     <Compile Remove="Common\AppConstants.cs" />
     <Compile Remove="Common\AppSettingsBase.cs" />
     <Compile Remove="Converters\NullToIsEnabledConverter .cs" />
