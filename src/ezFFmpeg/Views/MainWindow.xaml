@@ -117,7 +117,7 @@
                                            Converter={StaticResource BoolToVisibilityConverter}}">
 
             <ToolBar Background="#EEE">
-                
+
                 <Button Name="AddToolBarButton" 
                         ToolTip="アイテムの追加" 
                         b:GrayImageBehavior.EnableGrayImage="True"
@@ -241,7 +241,7 @@
                                Text="{Binding AudioEncoderStatus}" 
                                Foreground="#000000" 
                                VerticalAlignment="Center"/>
-                                
+
                     <!-- ===== 右端：経過時間 ===== -->
                     <Border Grid.Column="4"
                             Margin="8 3 8 3"
@@ -312,7 +312,7 @@
 
                     <!-- Events -->
                     <i:Interaction.Triggers>
-                        
+
                         <i:EventTrigger EventName="SelectionChanged">
                             <i:InvokeCommandAction Command="{Binding FileListViewSelectionChangedCommand}"
                                    PassEventArgsToCommand="True" />
@@ -384,14 +384,14 @@
                                                               Converter={StaticResource InverseBoolConverter}}">
 
                                     <i:Interaction.Triggers>
-                                        
+
                                         <i:EventTrigger EventName="Checked">
                                             <i:InvokeCommandAction 
                                             Command="{Binding DataContext.FileItemCheckedCommand,
                                                               RelativeSource={RelativeSource AncestorType=ListView}}"
                                             CommandParameter="{Binding}" />
                                         </i:EventTrigger>
-                                        
+
                                         <i:EventTrigger EventName="Unchecked">
                                             <i:InvokeCommandAction 
                                             Command="{Binding DataContext.FileItemUncheckedCommand,
@@ -487,7 +487,7 @@
                                         <TextBlock Text="{Binding VideoInfo}" Margin="4 0" Foreground="#666"/>
                                         <TextBlock Text="{Binding AudioInfo}" Margin="4 0" Foreground="#666"/>
                                     </StackPanel>
-                                    
+
                                     <!-- 4段目：その他 -->
                                     <Grid Grid.Row="3" Margin="8 0">
 
@@ -499,7 +499,7 @@
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        
+
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
@@ -570,12 +570,12 @@
                                                                 Converter={StaticResource InverseBoolConverter}}"
                                                       b:FocusTargetBehavior.FocusTarget="{Binding ElementName=StartPositionTextBox}"
                                                       b:ListViewAutoSelectBehavior.EnableAutoSelect="True">
-                                            
+
                                             <Image Source="pack://application:,,,/Resources/Images/Up.png"
                                                    Width="16"
                                                    Height="6"/>
                                         </RepeatButton>
-                                        
+
                                         <RepeatButton Grid.Column="2"
                                                       Grid.Row="1"
                                                       BorderBrush="LightGray"
@@ -756,87 +756,91 @@
                     Visibility="{Binding IsPreviewVisible,
                                 Converter={StaticResource BoolToVisibilityConverter}}">
 
-            <Grid>
+                <Grid>
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="200"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="200"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
                     <!-- ===== 動画プレビュー ===== -->
-                    <Grid x:Name="VideoArea" Grid.Row="0" Background="#F0F0F0">
+                    <Grid x:Name="VideoArea" 
+                          Grid.Row="0" 
+                          Background="#F0F0F0"
+                          ContextMenuOpening="Preview_ContextMenuOpening">
+
+                            <!-- ★ 右クリックメニュー -->
+                        <Grid.ContextMenu>
+                            <ContextMenu>
+
+                                <MenuItem Header="再生(P_)"
+                                    Command="{Binding Preview.PlayCommand}" />
+                                <MenuItem Header="一時停止(A_)"
+                                    Command="{Binding Preview.PauseCommand}" />
+                                <Separator/>
+                                <MenuItem Header="先頭に戻す(B_)"
+                                    Command="{Binding Preview.SeekToBeginningCommand}" />
+                                <Separator/>
+                                <MenuItem Header="開始位置に設定(S_)"
+                                    Command="{Binding Preview.SetStartPositionCommand}" />
+                                <MenuItem Header="終了位置に設定(E_)"
+                                    Command="{Binding Preview.SetEndPositionCommand}" />
+                            </ContextMenu>
+                        </Grid.ContextMenu>
 
                         <!-- サムネイル -->
                         <Image Source="{Binding SelectedFileItem.VideoThumbnail}"
-                               Stretch="Uniform" 
-                               Visibility="{Binding Preview.IsMediaOpened,
-                                            Converter={StaticResource InverseBoolToVisibilityConverter}}" />
+                            Stretch="Uniform" 
+                            Visibility="{Binding Preview.IsMediaOpened,
+                                        Converter={StaticResource InverseBoolToVisibilityConverter}}" />
 
                         <!-- 動画 -->
                         <MediaElement x:Name="MediaElement" 
-                                      Source="{Binding Preview.MediaSource}"
-                                      LoadedBehavior="Manual"
-                                      UnloadedBehavior="Manual"
-                                      Stretch="Uniform"
-                                      Visibility="{Binding Preview.IsMediaOpened,
-                                                    Converter={StaticResource BoolToVisibilityConverter}}">
-                                    <i:Interaction.Behaviors>
-                                        <b:MediaElementControlBehavior Preview="{Binding Preview}" />
-                                    </i:Interaction.Behaviors>
+                                    Source="{Binding Preview.MediaSource}"
+                                    LoadedBehavior="Manual"
+                                    UnloadedBehavior="Manual"
+                                    Stretch="Uniform"
+                                    Visibility="{Binding Preview.IsMediaOpened,
+                                                Converter={StaticResource BoolToVisibilityConverter}}">
+                            <i:Interaction.Behaviors>
+                                <b:MediaElementControlBehavior Preview="{Binding Preview}" />
+                            </i:Interaction.Behaviors>
                         </MediaElement>
 
                         <!-- エラー表示 -->
                         <Border Background="#AA000000"
-                                Visibility="{Binding Preview.MediaErrorMessage, 
-                                            Converter={StaticResource NullToVisibilityConverter}}">
+                            Visibility="{Binding Preview.MediaErrorMessage, 
+                                        Converter={StaticResource NullToVisibilityConverter}}">
+
                             <StackPanel HorizontalAlignment="Center"
-                                        VerticalAlignment="Center">
+                                    VerticalAlignment="Center">
                                 <TextBlock Text="⚠ 再生できません。"
-                                           Foreground="White"
-                                           FontSize="20"
-                                           HorizontalAlignment="Center" />
+                                        Foreground="White"
+                                        FontSize="20"
+                                        HorizontalAlignment="Center" />
 
                                 <TextBlock Text="{Binding Preview.MediaErrorMessage}"
-                                           Foreground="White"
-                                           FontSize="14"
-                                           HorizontalAlignment="Center"
-                                           TextWrapping="Wrap"
-                                           MaxWidth="300" />
+                                        Foreground="White"
+                                        FontSize="14"
+                                        HorizontalAlignment="Center"
+                                        TextWrapping="Wrap"
+                                        MaxWidth="300" />
                             </StackPanel>
                         </Border>
 
                         <!-- ===== 再生コントロール（動画の上に重ねる） ===== -->
                         <Border VerticalAlignment="Bottom"
-                                HorizontalAlignment="Stretch"
-                                Background="#80808080"
-                                Padding="6"
-                                Opacity="0">
-
-                            <!-- ★ 右クリックメニュー -->
-                            <Border.ContextMenu>
-                                <ContextMenu x:Name="PreviewContextMenu">
-
-                                    <MenuItem Header="再生(P_)"
-                                        Command="{Binding Preview.PlayCommand}" />
-                                    <MenuItem Header="一時停止(A_)"
-                                        Command="{Binding Preview.PauseCommand}" />
-                                    <Separator/>
-                                    <MenuItem Header="先頭に戻す(B_)"
-                                        Command="{Binding Preview.SeekToBeginningCommand}" />
-                                    <Separator/>
-                                    <MenuItem Header="開始位置に設定(S_)"
-                                        Command="{Binding Preview.SetStartPositionCommand}" />
-                                    <MenuItem Header="終了位置に設定(E_)"
-                                        Command="{Binding Preview.SetEndPositionCommand}" />
-                                </ContextMenu>
-                            </Border.ContextMenu>
+                            HorizontalAlignment="Stretch"
+                            Background="#80808080"
+                            Padding="6"
+                            Opacity="0">
 
                             <Border.RenderTransform>
                                 <TranslateTransform Y="10"/>
                             </Border.RenderTransform>
 
                             <Border.Style>
-                                
+
                                 <Style TargetType="Border">
 
                                     <!-- 初期状態 -->
@@ -848,8 +852,8 @@
                                             <MultiDataTrigger.Conditions>
                                                 <!-- MediaSource != null -->
                                                 <Condition Binding="{Binding Preview.MediaSource,
-                                                           Converter={StaticResource NullToBoolConverter}}"
-                                                           Value="True"/>
+                                                        Converter={StaticResource NullToBoolConverter}}"
+                                                        Value="True"/>
                                             </MultiDataTrigger.Conditions>
 
                                             <!-- ★ 表示中は常に操作可能 -->
@@ -860,12 +864,12 @@
                                                 <BeginStoryboard>
                                                     <Storyboard>
                                                         <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                                         To="1"
-                                                                         Duration="0:0:0.2"/>
+                                                                        To="1"
+                                                                        Duration="0:0:0.2"/>
                                                         <DoubleAnimation Storyboard.TargetProperty=
-                                                                        "(UIElement.RenderTransform).(TranslateTransform.Y)"
-                                                                            To="0"
-                                                                            Duration="0:0:0.2"/>
+                                                                    "(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                                                        To="0"
+                                                                        Duration="0:0:0.2"/>
                                                     </Storyboard>
                                                 </BeginStoryboard>
                                             </MultiDataTrigger.EnterActions>
@@ -875,12 +879,12 @@
                                                 <BeginStoryboard>
                                                     <Storyboard>
                                                         <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                                         To="0"
-                                                                         Duration="0:0:0.2"/>
+                                                                        To="0"
+                                                                        Duration="0:0:0.2"/>
                                                         <DoubleAnimation Storyboard.TargetProperty=
-                                                                        "(UIElement.RenderTransform).(TranslateTransform.Y)"
-                                                                            To="10"
-                                                                            Duration="0:0:0.2"/>
+                                                                    "(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                                                        To="10"
+                                                                        Duration="0:0:0.2"/>
                                                     </Storyboard>
                                                 </BeginStoryboard>
                                             </MultiDataTrigger.ExitActions>
@@ -903,37 +907,37 @@
 
                                 <!-- 再生 / 一時停止 -->
                                 <Button Grid.Column="0"
-                                        Command="{Binding Preview.TogglePlayPauseCommand}"
-                                        Background="Transparent"
-                                        BorderThickness="0">
+                                    Command="{Binding Preview.TogglePlayPauseCommand}"
+                                    Background="Transparent"
+                                    BorderThickness="0">
 
                                     <Button.Template>
                                         <ControlTemplate TargetType="Button">
                                             <ContentPresenter HorizontalAlignment="Center"
-                                                              VerticalAlignment="Center"/>
+                                                            VerticalAlignment="Center"/>
                                         </ControlTemplate>
                                     </Button.Template>
 
                                     <Image Source="{Binding Preview.PlayPauseImage}"
-                                           Width="20"
-                                           Height="20"/>
+                                        Width="20"
+                                        Height="20"/>
                                 </Button>
 
                                 <!-- 再生時間 -->
                                 <TextBlock Grid.Column="1"
-                                           Text="{Binding Preview.CurrentTimeText}"
-                                           VerticalAlignment="Center"
-                                           Foreground="White" 
-                                           Margin="4,0"/>
+                                        Text="{Binding Preview.CurrentTimeText}"
+                                        VerticalAlignment="Center"
+                                        Foreground="White" 
+                                        Margin="4,0"/>
 
                                 <!-- シークバー -->
                                 <Slider Grid.Column="2"
-                                        Minimum="0"
-                                        Maximum="{Binding Preview.TotalSeconds}"
-                                        Value="{Binding Preview.CurrentSeconds, Mode=TwoWay}"
-                                        IsMoveToPointEnabled="True"
-                                        VerticalAlignment="Center"
-                                        Margin="4,0,0,0">
+                                    Minimum="0"
+                                    Maximum="{Binding Preview.TotalSeconds}"
+                                    Value="{Binding Preview.CurrentSeconds, Mode=TwoWay}"
+                                    IsMoveToPointEnabled="True"
+                                    VerticalAlignment="Center"
+                                    Margin="4,0,0,0">
 
                                     <i:Interaction.Behaviors>
                                         <b:SliderSeekBehavior Preview="{Binding Preview}" />
@@ -941,15 +945,15 @@
                                 </Slider>
                             </Grid>
                         </Border>
-                        
+
                     </Grid>
 
                     <!-- ===== 動画情報 ===== -->
                     <Grid Grid.Row="1"
-                          Margin="0,8,0,0">
+                        Margin="0,8,0,0">
 
                         <Grid.RowDefinitions>
-                        <!-- ファイル名 + アイコン -->
+                            <!-- ファイル名 + アイコン -->
                             <RowDefinition Height="Auto"/>
                             <!-- セパレータ -->
                             <RowDefinition Height="Auto"/>
@@ -959,7 +963,7 @@
 
                         <!-- ファイル名 + アイコン -->
                         <Grid Grid.Row="0"
-                              Margin="0,0,0,4">
+                            Margin="0,0,0,4">
 
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -968,27 +972,27 @@
 
                             <!-- アイコン -->
                             <Image Grid.Column="0"
-                                   Source="{Binding SelectedFileItem.FileIcon}"
-                                   Width="32"
-                                   Height="32"
-                                   Margin="0,0,8,0"
-                                   VerticalAlignment="Top"/>
+                                Source="{Binding SelectedFileItem.FileIcon}"
+                                Width="32"
+                                Height="32"
+                                Margin="0,0,8,0"
+                                VerticalAlignment="Top"/>
 
                             <!-- ファイル名 -->
                             <TextBlock Grid.Column="1"
-                                       Text="{Binding SelectedFileItem.FileName}"
-                                       TextWrapping="Wrap"
-                                       VerticalAlignment="Center"/>
+                                    Text="{Binding SelectedFileItem.FileName}"
+                                    TextWrapping="Wrap"
+                                    VerticalAlignment="Center"/>
                         </Grid>
 
                         <!-- セパレータ -->
                         <Separator Grid.Row="1" 
-                                   Margin="0,6"/>
+                                Margin="0,6"/>
 
                         <!-- ← ScrollViewer 用 -->
                         <ScrollViewer Grid.Row="2"
-                                      VerticalScrollBarVisibility="Auto"
-                                      HorizontalScrollBarVisibility="Disabled">
+                                    VerticalScrollBarVisibility="Auto"
+                                    HorizontalScrollBarVisibility="Disabled">
 
                             <StackPanel Margin="0,8,2,0">
 
@@ -1033,152 +1037,148 @@
 
                                     <!-- 種類 -->
                                     <TextBlock Grid.Column="0"
-                                               Grid.Row="0" 
-                                               Text="種類"/>
+                                            Grid.Row="0" 
+                                            Text="種類"/>
 
                                     <TextBlock Grid.Column="1"
-                                               Grid.Row="0" 
-                                               Text="{Binding SelectedFileItem.FileType}"
-                                               TextAlignment="Right"/>
+                                            Grid.Row="0" 
+                                            Text="{Binding SelectedFileItem.FileType}"
+                                            TextAlignment="Right"/>
 
                                     <!-- サイズ -->
                                     <TextBlock Grid.Column="0"
-                                               Grid.Row="1"
-                                               Text="サイズ"/>
+                                            Grid.Row="1"
+                                            Text="サイズ"/>
 
                                     <TextBlock Grid.Column="1"
-                                               Grid.Row="1"
-                                               Text="{Binding SelectedFileItem.FileSize}"
-                                               TextAlignment="Right"/>
+                                            Grid.Row="1"
+                                            Text="{Binding SelectedFileItem.FileSize}"
+                                            TextAlignment="Right"/>
 
                                     <!-- 更新日時 -->
                                     <TextBlock Grid.Column="0"
-                                               Grid.Row="2"
-                                               Text="更新日時"/>
+                                            Grid.Row="2"
+                                            Text="更新日時"/>
 
                                     <TextBlock Grid.Column="1"
-                                               Grid.Row="2"
-                                               Text="{Binding SelectedFileItem.FileLastWriteTimeInfo}"
-                                               TextAlignment="Right"/>
+                                            Grid.Row="2"
+                                            Text="{Binding SelectedFileItem.FileLastWriteTimeInfo}"
+                                            TextAlignment="Right"/>
 
                                     <!-- 長さ -->
                                     <TextBlock Grid.Column="0"
-                                               Grid.Row="3"
-                                               Text="長さ"/>
+                                            Grid.Row="3"
+                                            Text="長さ"/>
 
                                     <TextBlock Grid.Column="1"
-                                               Grid.Row="3"
-                                               Text="{Binding SelectedFileItem.VideoDurationText}" 
-                                               TextAlignment="Right"/>
+                                            Grid.Row="3"
+                                            Text="{Binding SelectedFileItem.VideoDurationText}" 
+                                            TextAlignment="Right"/>
 
                                     <!-- セパレータ -->
                                     <TextBlock Grid.Column="0"
-                                               Grid.Row="4"
-                                               Text="ビデオ"/>
+                                            Grid.Row="4"
+                                            Text="ビデオ"/>
 
                                     <Separator Grid.Column="1" 
-                                               Grid.Row="4"
-                                               Margin="0,6"/>
+                                            Grid.Row="4"
+                                            Margin="0,6"/>
 
                                     <!-- コーディック -->
                                     <TextBlock Grid.Column="0"
-                                               Grid.Row="5"
-                                               Text="コーディック"/>
+                                            Grid.Row="5"
+                                            Text="コーディック"/>
 
                                     <TextBlock Grid.Column="1" 
-                                               Grid.Row="5"
-                                               Text="{Binding SelectedFileItem.VideoCodec}" 
-                                               TextAlignment="Right"/>
+                                            Grid.Row="5"
+                                            Text="{Binding SelectedFileItem.VideoCodec}" 
+                                            TextAlignment="Right"/>
 
                                     <!-- 解像度 -->
                                     <TextBlock Grid.Column="0"
-                                               Grid.Row="6"
-                                               Text="解像度"/>
+                                            Grid.Row="6"
+                                            Text="解像度"/>
 
                                     <TextBlock Grid.Column="1" 
-                                               Grid.Row="6"
-                                               Text="{Binding SelectedFileItem.VideoResolution}" 
-                                               TextAlignment="Right"/>
+                                            Grid.Row="6"
+                                            Text="{Binding SelectedFileItem.VideoResolution}" 
+                                            TextAlignment="Right"/>
 
                                     <!-- 総ビットレート -->
                                     <TextBlock Grid.Column="0"
-                                               Grid.Row="7"
-                                               Text="ビットレート"/>
+                                            Grid.Row="7"
+                                            Text="ビットレート"/>
 
                                     <TextBlock Grid.Column="1" 
-                                               Grid.Row="7"
-                                               Text="{Binding SelectedFileItem.VideoBitRate}" 
-                                               TextAlignment="Right"/>
+                                            Grid.Row="7"
+                                            Text="{Binding SelectedFileItem.VideoBitRate}" 
+                                            TextAlignment="Right"/>
 
                                     <!-- フレーム率 -->
                                     <TextBlock Grid.Column="0"
-                                               Grid.Row="8"
-                                               Text="フレーム率"/>
+                                            Grid.Row="8"
+                                            Text="フレーム率"/>
 
                                     <TextBlock Grid.Column="1" 
-                                               Grid.Row="8"
-                                               Text="{Binding SelectedFileItem.VideoFrameRate}" 
-                                               TextAlignment="Right"/>
+                                            Grid.Row="8"
+                                            Text="{Binding SelectedFileItem.VideoFrameRate}" 
+                                            TextAlignment="Right"/>
 
                                     <!-- セパレータ -->
                                     <TextBlock Grid.Column="0"
-                                               Grid.Row="9"
-                                               Text="オーディオ"/>
+                                            Grid.Row="9"
+                                            Text="オーディオ"/>
 
                                     <Separator Grid.Column="1" 
-                                               Grid.Row="9"
-                                               Margin="0,6"/>
+                                            Grid.Row="9"
+                                            Margin="0,6"/>
 
                                     <!-- コーディック -->
                                     <TextBlock Grid.Column="0"
-                                               Grid.Row="10"
-                                               Text="コーディック"/>
+                                            Grid.Row="10"
+                                            Text="コーディック"/>
 
                                     <TextBlock Grid.Column="1" 
-                                               Grid.Row="10"
-                                               Text="{Binding SelectedFileItem.AudioCodec}" 
-                                               TextAlignment="Right"/>
+                                            Grid.Row="10"
+                                            Text="{Binding SelectedFileItem.AudioCodec}" 
+                                            TextAlignment="Right"/>
 
                                     <!-- ビットレート -->
                                     <TextBlock Grid.Column="0"
-                                               Grid.Row="11"
-                                               Text="ビットレート"/>
+                                            Grid.Row="11"
+                                            Text="ビットレート"/>
 
                                     <TextBlock Grid.Column="1" 
-                                               Grid.Row="11"
-                                               Text="{Binding SelectedFileItem.AudioBitRate}" 
-                                               TextAlignment="Right"/>
+                                            Grid.Row="11"
+                                            Text="{Binding SelectedFileItem.AudioBitRate}" 
+                                            TextAlignment="Right"/>
 
                                     <!-- チャンネル -->
                                     <TextBlock Grid.Column="0"
-                                               Grid.Row="12"
-                                               Text="チャンネル"/>
+                                            Grid.Row="12"
+                                            Text="チャンネル"/>
 
                                     <TextBlock Grid.Column="1" 
-                                               Grid.Row="12"
-                                               Text="{Binding SelectedFileItem.AudioChannels}" 
-                                               TextAlignment="Right"/>
+                                            Grid.Row="12"
+                                            Text="{Binding SelectedFileItem.AudioChannels}" 
+                                            TextAlignment="Right"/>
 
                                     <!-- サンプルレート -->
                                     <TextBlock Grid.Column="0"
-                                               Grid.Row="13"
-                                               Text="サンプルレート"/>
+                                            Grid.Row="13"
+                                            Text="サンプルレート"/>
 
                                     <TextBlock Grid.Column="1" 
-                                               Grid.Row="13"
-                                               Text="{Binding SelectedFileItem.AudioSampleRate}" 
-                                               TextAlignment="Right"/>
+                                            Grid.Row="13"
+                                            Text="{Binding SelectedFileItem.AudioSampleRate}" 
+                                            TextAlignment="Right"/>
 
                                 </Grid>
                             </StackPanel>
-
                         </ScrollViewer>
-
                     </Grid>
                 </Grid>
             </Border>
-
         </Grid>
-
     </DockPanel>
 </Window>

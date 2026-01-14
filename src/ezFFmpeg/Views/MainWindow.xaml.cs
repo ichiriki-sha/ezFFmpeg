@@ -32,6 +32,19 @@ namespace ezFFmpeg.Views
         }
 
         // ------------------------
+        // プレビューエリアのコンテキストメニューオープンイベント
+        // ------------------------
+        private void Preview_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            var vm = DataContext as MainWindowViewModel;
+
+            if (vm?.Preview?.MediaSource == null)
+            {
+                e.Handled = true; // ← ContextMenu を開かせない
+            }
+        }
+
+        // ------------------------
         // 閉じるイベント
         // ------------------------
         private void Window_Closing(object sender, CancelEventArgs e)
