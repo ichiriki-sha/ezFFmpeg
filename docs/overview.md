@@ -148,9 +148,9 @@ ezFFmpeg は以下を目的としません。
 
 ## 関連ドキュメント
 
-- [architecture.md](architecture.md)  
+- [Architecture](architecture.md)  
   → 全体構成・責務分離の詳細
-- [ffmpeg_options.md](ffmpeg_options.md)  
+- [FFmpeg-Options](ffmpeg-options.md)  
   → オプション設計方針
-- [profiles.md](profiles.md)  
+- [Profile](profile.md)  
   → プロファイル仕様

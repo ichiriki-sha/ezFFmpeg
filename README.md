@@ -18,7 +18,7 @@ ezFFmpeg は、FFmpeg を **簡単・安全に扱うための GUI ツール**で
 ## 動作環境
 
 - Windows11
-- .NET 10（別途インストールが必要）
+- .NET 10
 - FFmpeg（別途インストールが必要）
 
 ⚠️ **FFmpeg 本体は同梱していません。ユーザー自身でインストールしてください。**
@@ -101,11 +101,11 @@ ezFFmpeg/
 - [Architecture](docs/architecture.md)
   内部構造・責務分離・設計方針
 
-- [FFmpeg Options](docs/ffmpeg_options.md)
+- [FFmpeg-Options](docs/ffmpeg-options.md)
   FFmpeg オプション設計と引数生成ルール
 
-- [Profiles](docs/profiles.md)
-  エンコード設定（Profile）の考え方と管理方法
+- [Profile](docs/profile.md)
+  エンコード設定（Profiles）の考え方と管理方法
 
 - [FAQ](docs/faq.md)
   よくある質問とトラブルシューティング
