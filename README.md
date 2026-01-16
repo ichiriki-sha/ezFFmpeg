@@ -105,7 +105,7 @@ ezFFmpeg/
   FFmpeg オプション設計と引数生成ルール
 
 - [Profile](docs/profile.md)
-  エンコード設定（Profiles）の考え方と管理方法
+  エンコード設定（Profile）の考え方と管理方法
 
 - [FAQ](docs/faq.md)
   よくある質問とトラブルシューティング

@@ -1,4 +1,4 @@
-# FFmpeg オプション設計（ffmpeg-options）
+# FFmpeg オプション設計（FFmpeg-Options）
 
 本ドキュメントでは、**現在 ezFFmpeg に実装されている FFmpeg / FFprobe 引数生成処理**を基に、
 どのオプションを・どの責務で・どのような設計思想で扱っているかを整理します。
@@ -243,7 +243,7 @@ COPY の場合は **付与されない**。
 
 ## まとめ
 
-この ffmpeg-options 設計は、
+この FFmpeg-Options 設計は、
 
 - **実装されている事実ベース**で整理され
 - 未実装機能を明確に区別し
