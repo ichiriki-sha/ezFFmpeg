@@ -47,7 +47,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - 変換開始時間を指定して変換できるように修正
 - オプション画面の並列数のスクロールバーをボタンに変更
 
-## [0.9.3.0] - 2025-01-29
+## [0.9.3.0] - 2025-12-29
 
 ### Update
 
