@@ -30,7 +30,7 @@ namespace ezFFmpeg.ViewModels
             {
                 SetProperty(ref _mediaSource, value);
                 if (MediaSource == null)
-                    MediaErrorMessage = null;
+                    Initialize();
             }
         }
 
@@ -130,17 +130,9 @@ namespace ezFFmpeg.ViewModels
 
         public void SetSource(FileItem? item)
         {
-            // 再生中のみ停止
-            if (IsPlaying)
-            {
-                Pause();
-            }
+            
+            Initialize();
 
-            IsPlaying = false;
-            IsMediaOpened = false;
-            CurrentSeconds = 0;
-            CurrentTimeText = "00:00:00.000";
-            MediaErrorMessage = null;
             _item = item;
 
             if (item == null || !File.Exists(item.FilePath))
@@ -151,6 +143,23 @@ namespace ezFFmpeg.ViewModels
 
             MediaSource = new Uri(item.FilePath);
             TotalSeconds = item.VideoDuration.TotalSeconds;
+        }
+
+        private void Initialize()
+        {
+
+            // 再生中のみ停止
+            if (IsPlaying)
+            {
+                Pause();
+            }
+
+            IsPlaying = false;
+            IsMediaOpened = false;
+            CurrentSeconds = 0;
+            MediaErrorMessage = null;
+
+            _item = null;
         }
 
         private void Play() => PlayRequested?.Invoke();

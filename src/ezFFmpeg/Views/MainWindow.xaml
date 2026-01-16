@@ -26,6 +26,7 @@
             <c:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
             <c:NullToBoolConverter x:Key="NullToBoolConverter" />
             <c:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+            <c:SliderProgressWidthConverter x:Key="SliderProgressWidthConverter"/>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -760,6 +761,8 @@
 
                     <Grid.RowDefinitions>
                         <RowDefinition Height="200"/>
+                        <!-- グリッドスプリッター -->
+                        <RowDefinition Height="5"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
@@ -774,13 +777,36 @@
                             <ContextMenu>
 
                                 <MenuItem Header="再生(P_)"
-                                    Command="{Binding Preview.PlayCommand}" />
+                                          Command="{Binding Preview.PlayCommand}" >
+                                    <MenuItem.Icon>
+                                        <Image Source="pack://application:,,,/Resources/Images/MenuPlay.png"
+                                               Width="16"
+                                               Height="16"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+
                                 <MenuItem Header="一時停止(A_)"
-                                    Command="{Binding Preview.PauseCommand}" />
+                                    Command="{Binding Preview.PauseCommand}">
+                                    <MenuItem.Icon>
+                                        <Image Source="pack://application:,,,/Resources/Images/MenuPause.png"
+                                               Width="16"
+                                               Height="16"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+
                                 <Separator/>
-                                <MenuItem Header="先頭に戻す(B_)"
-                                    Command="{Binding Preview.SeekToBeginningCommand}" />
+
+                                <MenuItem Header="前へ(B_)"
+                                          Command="{Binding Preview.SeekToBeginningCommand}" >
+                                    <MenuItem.Icon>
+                                        <Image Source="pack://application:,,,/Resources/Images/MenuBeginning.png"
+                                               Width="16"
+                                               Height="16"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
+
                                 <Separator/>
+                                
                                 <MenuItem Header="開始位置に設定(S_)"
                                     Command="{Binding Preview.SetStartPositionCommand}" />
                                 <MenuItem Header="終了位置に設定(E_)"
@@ -830,10 +856,10 @@
 
                         <!-- ===== 再生コントロール（動画の上に重ねる） ===== -->
                         <Border VerticalAlignment="Bottom"
-                            HorizontalAlignment="Stretch"
-                            Background="#80808080"
-                            Padding="6"
-                            Opacity="0">
+                                HorizontalAlignment="Stretch"
+                                Background="#80808080"
+                                Padding="6"
+                                Opacity="0">
 
                             <Border.RenderTransform>
                                 <TranslateTransform Y="10"/>
@@ -852,8 +878,8 @@
                                             <MultiDataTrigger.Conditions>
                                                 <!-- MediaSource != null -->
                                                 <Condition Binding="{Binding Preview.MediaSource,
-                                                        Converter={StaticResource NullToBoolConverter}}"
-                                                        Value="True"/>
+                                                            Converter={StaticResource NullToBoolConverter}}"
+                                                            Value="True"/>
                                             </MultiDataTrigger.Conditions>
 
                                             <!-- ★ 表示中は常に操作可能 -->
@@ -932,24 +958,94 @@
 
                                 <!-- シークバー -->
                                 <Slider Grid.Column="2"
-                                    Minimum="0"
-                                    Maximum="{Binding Preview.TotalSeconds}"
-                                    Value="{Binding Preview.CurrentSeconds, Mode=TwoWay}"
-                                    IsMoveToPointEnabled="True"
-                                    VerticalAlignment="Center"
-                                    Margin="4,0,0,0">
+                                        Minimum="0"
+                                        Maximum="{Binding Preview.TotalSeconds}"
+                                        Value="{Binding Preview.CurrentSeconds, Mode=TwoWay}"
+                                        IsMoveToPointEnabled="True"
+                                        VerticalAlignment="Center"
+                                        Margin="4,0,0,0">
 
                                     <i:Interaction.Behaviors>
                                         <b:SliderSeekBehavior Preview="{Binding Preview}" />
+                                        <b:SliderTimeTooltipBehavior TotalSeconds="{Binding Preview.TotalSeconds}" />
                                     </i:Interaction.Behaviors>
+
+                                    <Slider.Template>
+                                        <ControlTemplate TargetType="Slider">
+                                            <Grid Height="12">
+
+                                                <!-- 未再生バー（背景） -->
+                                                <Border Height="4"
+                                                        Background="#444"
+                                                        VerticalAlignment="Center"
+                                                        CornerRadius="2"/>
+
+                                                <!--<Binding RelativeSource="{RelativeSource TemplatedParent}" Path="ActualWidth"/>-->
+
+                                                <!-- 再生済みバー -->
+                                                <Border Height="4"
+                                                        Background="#2D7DFF"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Left"
+                                                        CornerRadius="2"
+                                                        Panel.ZIndex="10">
+                                                    <Border.Width>
+                                                        <MultiBinding Converter="{StaticResource SliderProgressWidthConverter}">
+                                                            <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Value"/>
+                                                            <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Maximum"/>
+                                                            <Binding ElementName="PART_Track" Path="ActualWidth"/>
+                                                            <Binding ElementName="PART_Track" Path="Thumb.ActualWidth"/>
+                                                        </MultiBinding>
+                                                    </Border.Width>
+                                                </Border>
+                                                
+                                                <!-- トラック -->
+                                                <Track x:Name="PART_Track">
+                                                    <Track.DecreaseRepeatButton>
+                                                        <RepeatButton Height="6"
+                                                                      Background="#888"
+                                                                      IsEnabled="False"/>
+                                                    </Track.DecreaseRepeatButton>
+
+                                                    <Track.Thumb>
+                                                        <Thumb Width="12"
+                                                               Height="12"
+                                                               Background="#F0F0F0"
+                                                               BorderBrush="#444"
+                                                               BorderThickness="1">
+                                                            <Thumb.Template>
+                                                                <ControlTemplate TargetType="Thumb">
+                                                                    <Ellipse Fill="{TemplateBinding Background}"
+                                                                             Stroke="{TemplateBinding BorderBrush}"
+                                                                             StrokeThickness="{TemplateBinding BorderThickness}"/>
+                                                                </ControlTemplate>
+                                                            </Thumb.Template>
+                                                        </Thumb>
+                                                    </Track.Thumb>
+
+                                                    <Track.IncreaseRepeatButton>
+                                                        <RepeatButton Height="4"
+                                                                      Background="#444"
+                                                                      IsEnabled="False"/>
+                                                    </Track.IncreaseRepeatButton>
+                                                </Track>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Slider.Template>
                                 </Slider>
                             </Grid>
                         </Border>
-
                     </Grid>
 
+                    <GridSplitter Grid.Row="1"
+                              Height="3"
+                              HorizontalAlignment="Stretch"
+                              Background="Transparent"
+                              Cursor="SizeNS"
+                              ShowsPreview="True"/>
+
                     <!-- ===== 動画情報 ===== -->
-                    <Grid Grid.Row="1"
+                    <Grid Grid.Row="2"
                         Margin="0,8,0,0">
 
                         <Grid.RowDefinitions>
