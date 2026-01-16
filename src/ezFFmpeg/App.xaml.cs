@@ -19,42 +19,70 @@ namespace ezFFmpeg
     public partial class App : Application
     {
         /// <summary>
-        /// シングルトンインスタンスを保証するためのMutex。
+        /// 単一インスタンスを保証するための Mutex。
         /// </summary>
         private static Mutex? _mutex;
 
+        /// <summary>
+        /// アプリケーション全体で共有される設定情報。
+        /// </summary>
+        AppSettings _setting = null!;
+
+        /// <summary>
+        /// 起動時に表示するスプラッシュウィンドウ。
+        /// </summary>
+        SplashWindow _splash = null!;
+
         // ------------------------------------------------------------------
-        // 起動補助メソッド
+        // 単一インスタンス制御
         // ------------------------------------------------------------------
-        private bool AcquireMutex()
+
+        /// <summary>
+        /// Mutex を取得し、単一インスタンスで起動できるかを判定する。
+        /// </summary>
+        /// <returns>true: 初回起動 / false: 既に起動中</returns>
+        private static bool AcquireMutex()
         {
             const string mutexName = "ezFFmpeg_SingleInstanceMutex";
             _mutex = new Mutex(true, mutexName, out bool createdNew);
             return createdNew;
         }
 
-        private AppSettings LoadOrCreateSettings(out bool loaded)
+        // ------------------------------------------------------------------
+        // 設定・初期化関連
+        // ------------------------------------------------------------------
+
+        /// <summary>
+        /// 設定ファイルを読み込み、存在しない場合は新規作成する。
+        /// </summary>
+        private static AppSettings LoadOrCreateSettings()
         {
-            loaded = false;
             var setting = new AppSettings();
 
             if (File.Exists(AppPath.GetAppSettingPath()))
             {
                 setting = AppSettingsManager.LoadSettings();
-                loaded = true;
             }
 
             return setting;
         }
 
-        private void EnsureFolders(AppSettings setting)
+        /// <summary>
+        /// アプリケーションで使用する各種フォルダを作成する。
+        /// </summary>
+        private static void EnsureFolders(AppSettings setting)
         {
             Directory.CreateDirectory(setting.SettingsFolderPath);
             Directory.CreateDirectory(setting.WorkFolderPath);
             Directory.CreateDirectory(AppPath.GetOutputFolderPath());
         }
 
-        private bool EnsureFFmpegSetting(AppSettings setting)
+        /// <summary>
+        /// FFmpeg の設定が正しく行われているかを確認し、
+        /// 未設定の場合はダイアログで設定を促す。
+        /// </summary>
+        /// <returns>true: 継続可能 / false: 起動中断</returns>
+        private static bool EnsureFFmpegSetting(AppSettings setting)
         {
             if (!string.IsNullOrWhiteSpace(setting.FFmpegFolderPath) &&
                 Directory.Exists(setting.FFmpegFolderPath))
@@ -74,7 +102,10 @@ namespace ezFFmpeg
             return true;
         }
 
-        private void InitializeFFmpeg(AppSettings setting)
+        /// <summary>
+        /// FFmpeg サービスと各種エンコーダ情報を初期化する。
+        /// </summary>
+        private static void InitializeFFmpeg(AppSettings setting)
         {
             setting.FFmpegService = new FFmpegService(setting.FFmpegFolderPath!);
 
@@ -82,9 +113,12 @@ namespace ezFFmpeg
             AudioEncoders.Initialize(setting.FFmpegService);
         }
 
-        private void InitializeProfiles(AppSettings setting, bool loaded)
+        /// <summary>
+        /// プロファイルを初期化し、使用するプロファイルを決定する。
+        /// </summary>
+        private static void InitializeProfiles(AppSettings setting)
         {
-            if (!loaded)
+            if (setting.Profiles.Count == 0)
             {
                 setting.Profiles = BuiltInProfileProvider.CreateDefaults(setting.UseGpu);
             }
@@ -93,13 +127,23 @@ namespace ezFFmpeg
             setting.CurrentProfile = profileManager.GetPreferredProfile();
         }
 
-        private void ShowMainWindow(AppSettings setting)
+        // ------------------------------------------------------------------
+        // UI 制御
+        // ------------------------------------------------------------------
+
+        /// <summary>
+        /// メインウィンドウを表示する。
+        /// </summary>
+        private static void ShowMainWindow(AppSettings setting)
         {
             var mainWindow = new MainWindow(setting);
             mainWindow.Show();
         }
 
-        private void CleanupWorkFolder(AppSettings setting)
+        /// <summary>
+        /// 作業フォルダ内の一時ファイルを削除する。
+        /// </summary>
+        private static void CleanupWorkFolder(AppSettings setting)
         {
             foreach (var file in Directory.GetFiles(setting.WorkFolderPath))
             {
@@ -115,12 +159,31 @@ namespace ezFFmpeg
         }
 
         /// <summary>
-        /// アプリケーション起動時に呼ばれるイベントハンドラー。
-        /// 単一インスタンスの確認、設定の読み込み、必要フォルダの作成、
-        /// FFmpeg設定確認、エンコーダ初期化、メインウィンドウ表示を行います。
+        /// Splash 画面の進捗バーを滑らかに更新する。
         /// </summary>
-        /// <param name="e">起動引数</param>
-        protected override void OnStartup(StartupEventArgs e)
+        private void SmoothProgress(string message, int from, int to)
+        {
+
+            _splash.ViewModel.Message = message;
+
+            for (int i = from; i <= to; i++)
+            {
+                _splash.ViewModel.Progress = i;
+                Thread.Sleep(10); // 10ms なら 1% = 10ms → 100% で 1秒
+            }
+        }
+
+        // ------------------------------------------------------------------
+        // アプリケーションライフサイクル
+        // ------------------------------------------------------------------
+
+        /// <summary>
+        /// アプリケーション起動時に呼ばれる。
+        /// 
+        /// Splash 表示 → 初期化 → MainWindow 表示
+        /// という流れを制御する。
+        /// </summary>
+        protected override async void OnStartup(StartupEventArgs e)
         {
 
             // 重複起動の抑止
@@ -132,30 +195,72 @@ namespace ezFFmpeg
 
             base.OnStartup(e);
 
-            // 設定のロード
-            var setting = LoadOrCreateSettings(out bool loaded);
+            // -----------------------------
+            // Splash 表示
+            // -----------------------------
+            _splash = new SplashWindow();
+            _splash.Show();
 
-            // フォルダの保証
-            EnsureFolders(setting);
+            SmoothProgress("起動中...", 0, 10);
 
-            // FFmpeg 設定確認
-            if (!EnsureFFmpegSetting(setting))
+            // 描画を即時反映
+            await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Background);
+
+            // -----------------------------
+            // 重い初期化処理
+            // -----------------------------
+
+            await Task.Run(() =>
             {
-                Shutdown();
-                return;
-            }
 
-            // FFmpeg / Encoder 初期化
-            InitializeFFmpeg(setting);
+                // 設定のロード
+                SmoothProgress("設定を読み込み中...", 10, 20);
+                _setting = LoadOrCreateSettings();
 
-            // プロファイル初期化
-            InitializeProfiles(setting, loaded);
+                // 作業フォルダを作成
+                SmoothProgress("作業フォルダを作成中...", 20, 30);
+                EnsureFolders(_setting);
+
+                // FFmpeg 設定確認
+                SmoothProgress("FFmpeg を確認中...", 30, 40);
+                if (!EnsureFFmpegSetting(_setting))
+                {
+                    Shutdown();
+                    return;
+                }
+
+                // FFmpeg / Encoder 初期化
+                SmoothProgress("FFmpeg を初期化中...", 40, 80);
+                InitializeFFmpeg(_setting);
+
+                // プロファイル初期化
+                SmoothProgress("プロファイルを準備中...", 80, 90);
+                InitializeProfiles(_setting);
+            });
 
             // メインウィンドウ表示
-            ShowMainWindow(setting);
+            ShowMainWindow(_setting);
 
-            // 作業フォルダクリーンアップ
-            CleanupWorkFolder(setting);
+            // 準備完了
+            SmoothProgress("準備完了...", 90, 100);
+            _splash.ViewModel.Progress = 100;
+            _splash.Close();
+        }
+
+        /// <summary>
+        /// アプリケーション終了時の後処理。
+        /// </summary>
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
+
+            if (_setting != null)
+            {
+                CleanupWorkFolder(_setting);
+            }
+
+            _mutex?.ReleaseMutex();
+            _mutex?.Dispose();
         }
     }
 }
