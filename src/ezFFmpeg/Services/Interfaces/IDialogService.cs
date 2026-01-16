@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows;
 using ezFFmpeg.Models.Common;
+using ezFFmpeg.Models.Profiles;
 
 namespace ezFFmpeg.Services.Interfaces
 {

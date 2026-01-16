@@ -127,7 +127,7 @@ namespace ezFFmpeg.Services.Conversion
 
             // 出力先フルパスを構築
             var outputPath = Path.Combine(
-                settings.CurrentProfile.OutputFolderPath,
+                settings.CurrentProfile!.OutputFolderPath,
                 outputFileName);
 
             // FFmpeg の変換引数を生成

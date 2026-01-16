@@ -1,4 +1,4 @@
-﻿using ezFFmpeg.Models.Common;
+﻿using ezFFmpeg.Models.Profiles;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -53,22 +53,6 @@ namespace ezFFmpeg.Common
                     // 正常に読み込めた場合はそのまま返す
                     if (loaded != null)
                     {
-                        Profile? profile;
-                        
-                        // デフォルトがあれば設定する
-                        profile = loaded.Profiles.FirstOrDefault(p => p.IsDefault);
-                        if (profile != null)
-                        {
-                            loaded.CurrentProfile = profile;
-                        }
-
-                        // 最終に使用したのもがあれば設定する
-                        profile = loaded.Profiles.FirstOrDefault(p => p.IsLastUsed);
-                        if (profile != null)
-                        {
-                            loaded.CurrentProfile = profile;
-                        }
-
                         return loaded;
                     }
                 }

@@ -5,6 +5,7 @@ using ezFFmpeg.Models.Encoder;
 using ezFFmpeg.Models.Interfaces;
 using ezFFmpeg.Models.Media;
 using ezFFmpeg.Models.Output;
+using ezFFmpeg.Models.Profiles;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

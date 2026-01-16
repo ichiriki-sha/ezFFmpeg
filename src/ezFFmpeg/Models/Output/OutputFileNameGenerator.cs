@@ -1,6 +1,7 @@
 ﻿using ezFFmpeg.Common;
 using ezFFmpeg.Models.Common;
 using ezFFmpeg.Models.Encoder;
+using ezFFmpeg.Models.Profiles;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -96,14 +97,14 @@ namespace ezFFmpeg.Models.Output
             var tags = new Dictionary<string, string>
             {
                 [OutputFileTags.FileName.Tag] = Path.GetFileNameWithoutExtension(file.FilePath),
-                [OutputFileTags.VideoCodec.Tag] = GetVideoEncoderTag(file,settings.CurrentProfile),
-                [OutputFileTags.VideoResolution.Tag] = GetVideoResolutionTag(settings.CurrentProfile),
-                [OutputFileTags.AudioCodec.Tag] = GetAudioEncoderTag(file, settings.CurrentProfile),
+                [OutputFileTags.VideoCodec.Tag] = GetVideoEncoderTag(file,settings.CurrentProfile!),
+                [OutputFileTags.VideoResolution.Tag] = GetVideoResolutionTag(settings.CurrentProfile!),
+                [OutputFileTags.AudioCodec.Tag] = GetAudioEncoderTag(file, settings.CurrentProfile!),
                 [OutputFileTags.TimeStamp.Tag] = settings.ProcessStartTime.ToString("yyyyMMddHHmmss")
             };
 
             // プロファイルで指定された出力ファイル名テンプレート
-            string ret = $"{settings.CurrentProfile.OutputFileFormat}{settings.CurrentProfile.OutputFormat}";
+            string ret = $"{settings.CurrentProfile!.OutputFileFormat}{settings.CurrentProfile.OutputFormat}";
 
             // タグをテンプレート内に置換
             foreach (var tag in tags)

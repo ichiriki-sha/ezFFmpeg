@@ -1,5 +1,7 @@
-﻿using ezFFmpeg.Models.Common;
+﻿using ezFFmpeg.Models.Encoder;
 using ezFFmpeg.Models.Interfaces;
+using ezFFmpeg.Models.Presets;
+using ezFFmpeg.Models.Profiles;
 using ezFFmpeg.Services.FFmpeg;
 using ezFFmpeg.Services.Mapping;
 using System.Windows;
@@ -96,7 +98,7 @@ namespace ezFFmpeg.Common
         /// 最後に使用したプロファイルを保持するため、JSON には保存しない。
         /// </summary>
         [System.Text.Json.Serialization.JsonIgnore]
-        public Profile CurrentProfile { get; set; }
+        public Profile? CurrentProfile { get; set; }
 
         /// <summary>
         /// FFmpeg 操作用サービス。
@@ -156,19 +158,6 @@ namespace ezFFmpeg.Common
             IsFFmpegEnableLog   = false;
             UseGpu              = true;
             ParallelCount       = ConversionParallelLimits.Default;
-
-            // -----------------------------------------------
-            // プロファイル初期化
-            // -----------------------------------------------
-            var profile = new Profile() { IsDefault = true };
-            Profiles.Add(profile);
-            CurrentProfile = profile;
-
-            // FFmpeg フォルダが有効な場合のみサービスを生成
-            if (FFmpegPathService.IsFFmpegFolder(FFmpegFolderPath))
-            {
-                FFmpegService = new FFmpegService(FFmpegFolderPath);
-            }
 
             // -----------------------------------------------
             // UI 表示設定

@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using ezFFmpeg.Models.Common;
 using ezFFmpeg.Services.Dialog;
+using ezFFmpeg.Models.Profiles;
 
 namespace ezFFmpeg.Views
 {

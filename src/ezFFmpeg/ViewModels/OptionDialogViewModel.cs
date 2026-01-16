@@ -3,6 +3,7 @@ using ezFFmpeg.Helpers;
 using ezFFmpeg.Models.Common;
 using ezFFmpeg.Models.DialogResults;
 using ezFFmpeg.Models.Encoder;
+using ezFFmpeg.Models.Profiles;
 using ezFFmpeg.Services.FFmpeg;
 using ezFFmpeg.Services.Interfaces;
 using System.Collections.ObjectModel;
@@ -221,9 +222,7 @@ namespace ezFFmpeg.ViewModels
             DefaultProfileCommand       = new RelayCommand(() => SetDefaultProfile(SelectedProfile!));
 
             // 追加用のプロファイルを準備
-            Profile profile             = settings.UseGpu ? 
-                                                new(VideoEncoders.GetDefaultGpuEncoderName()) : 
-                                                new();
+            Profile profile             = new(settings.UseGpu);
             profile.ProfileName         = "- 新規 -";
             profile.IsUserDefined       = true;
             AddProfileCommand           = new RelayCommand(

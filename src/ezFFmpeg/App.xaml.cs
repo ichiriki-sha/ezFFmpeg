@@ -2,8 +2,8 @@
 using ezFFmpeg.Models.Encoder;
 using ezFFmpeg.Services.Dialog;
 using ezFFmpeg.Services.FFmpeg;
-using ezFFmpeg.Services.Interfaces;
 using ezFFmpeg.Views;
+using ezFFmpeg.Models.Profiles;
 using System.Configuration;
 using System.Data;
 using System.IO;
@@ -23,6 +23,97 @@ namespace ezFFmpeg
         /// </summary>
         private static Mutex? _mutex;
 
+        // ------------------------------------------------------------------
+        // 起動補助メソッド
+        // ------------------------------------------------------------------
+        private bool AcquireMutex()
+        {
+            const string mutexName = "ezFFmpeg_SingleInstanceMutex";
+            _mutex = new Mutex(true, mutexName, out bool createdNew);
+            return createdNew;
+        }
+
+        private AppSettings LoadOrCreateSettings(out bool loaded)
+        {
+            loaded = false;
+            var setting = new AppSettings();
+
+            if (File.Exists(AppPath.GetAppSettingPath()))
+            {
+                setting = AppSettingsManager.LoadSettings();
+                loaded = true;
+            }
+
+            return setting;
+        }
+
+        private void EnsureFolders(AppSettings setting)
+        {
+            Directory.CreateDirectory(setting.SettingsFolderPath);
+            Directory.CreateDirectory(setting.WorkFolderPath);
+            Directory.CreateDirectory(AppPath.GetOutputFolderPath());
+        }
+
+        private bool EnsureFFmpegSetting(AppSettings setting)
+        {
+            if (!string.IsNullOrWhiteSpace(setting.FFmpegFolderPath) &&
+                Directory.Exists(setting.FFmpegFolderPath))
+            {
+                return true;
+            }
+
+            var dialogService = new DialogService();
+            var ret = dialogService.ShowOptionDialog(setting);
+
+            if (!ret.IsAccepted)
+                return false;
+
+            setting.CopyFrom(ret);
+            AppSettingsManager.SaveSettings(setting);
+
+            return true;
+        }
+
+        private void InitializeFFmpeg(AppSettings setting)
+        {
+            setting.FFmpegService = new FFmpegService(setting.FFmpegFolderPath!);
+
+            VideoEncoders.Initialize(setting.FFmpegService);
+            AudioEncoders.Initialize(setting.FFmpegService);
+        }
+
+        private void InitializeProfiles(AppSettings setting, bool loaded)
+        {
+            if (!loaded)
+            {
+                setting.Profiles = BuiltInProfileProvider.CreateDefaults(setting.UseGpu);
+            }
+
+            var profileManager = new ProfileManager(setting.Profiles);
+            setting.CurrentProfile = profileManager.GetPreferredProfile();
+        }
+
+        private void ShowMainWindow(AppSettings setting)
+        {
+            var mainWindow = new MainWindow(setting);
+            mainWindow.Show();
+        }
+
+        private void CleanupWorkFolder(AppSettings setting)
+        {
+            foreach (var file in Directory.GetFiles(setting.WorkFolderPath))
+            {
+                try
+                {
+                    File.Delete(file);
+                }
+                catch
+                {
+                    // 削除失敗は無視
+                }
+            }
+        }
+
         /// <summary>
         /// アプリケーション起動時に呼ばれるイベントハンドラー。
         /// 単一インスタンスの確認、設定の読み込み、必要フォルダの作成、
@@ -31,80 +122,40 @@ namespace ezFFmpeg
         /// <param name="e">起動引数</param>
         protected override void OnStartup(StartupEventArgs e)
         {
-            const string mutexName = "ezFFmpeg_SingleInstanceMutex";
 
-            // すでに起動しているか確認
-            _mutex = new Mutex(true, mutexName, out bool createdNew);
-
-            if (!createdNew)
+            // 重複起動の抑止
+            if (!AcquireMutex())
             {
-                // すでに起動している場合はアプリを終了
-                // MessageBoxで通知も可能（現在はコメントアウト）
-                // MessageBox.Show("ezFFmpeg はすでに起動しています。",
-                //                 "重複起動",
-                //                 MessageBoxButton.OK,
-                //                 MessageBoxImage.Information);
-
                 Shutdown();
                 return;
             }
 
             base.OnStartup(e);
 
-            // 設定を読み込む
-            var setting = AppSettingsManager.LoadSettings();
+            // 設定のロード
+            var setting = LoadOrCreateSettings(out bool loaded);
 
-            // 必要なフォルダが存在しない場合は作成
-            if (!Directory.Exists(setting.SettingsFolderPath))
-                Directory.CreateDirectory(setting.SettingsFolderPath);
+            // フォルダの保証
+            EnsureFolders(setting);
 
-            if (!Directory.Exists(setting.WorkFolderPath))
-                Directory.CreateDirectory(setting.WorkFolderPath);
-
-            if (!Directory.Exists(AppPath.GetOutputFolderPath()))
-                Directory.CreateDirectory(AppPath.GetOutputFolderPath());
-
-            // FFmpegフォルダが未設定、または無効な場合は設定ダイアログを表示
-            if (string.IsNullOrWhiteSpace(setting.FFmpegFolderPath) ||
-               !FFmpegPathService.IsFFmpegFolder(setting.FFmpegFolderPath))
-            {
-                DialogService dialogService = new();
-                var ret = dialogService.ShowOptionDialog(setting);
-
-                if (ret.IsAccepted)
-                {
-                    // ユーザーが設定を承認した場合、設定を反映
-                    setting.CopyFrom(ret);
-                    setting.FFmpegService = new(ret.FFmpegFolderPath!);
-
-                    // 設定を保存
-                    AppSettingsManager.SaveSettings(setting);
-                }
-            }
-
-            // FFmpegService が設定されていなければアプリを終了
-            if (setting.FFmpegService == null)
+            // FFmpeg 設定確認
+            if (!EnsureFFmpegSetting(setting))
             {
                 Shutdown();
                 return;
             }
 
-            // エンコーダの初期化
-            VideoEncoders.Initialize(setting.FFmpegService);
-            AudioEncoders.Initialize(setting.FFmpegService);
+            // FFmpeg / Encoder 初期化
+            InitializeFFmpeg(setting);
 
-            // メインウィンドウを作成・表示
-            var mainWindow = new MainWindow(setting);
-            mainWindow.Show();
+            // プロファイル初期化
+            InitializeProfiles(setting, loaded);
 
-            // 作業フォルダのクリーンアップ
-            foreach (var file in Directory.GetFiles(setting.WorkFolderPath))
-            {
-                try
-                {
-                    File.Delete(file);
-                } catch   { /* 無視 */ }
-            }
+            // メインウィンドウ表示
+            ShowMainWindow(setting);
+
+            // 作業フォルダクリーンアップ
+            CleanupWorkFolder(setting);
         }
     }
 }

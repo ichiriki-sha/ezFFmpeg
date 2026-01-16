@@ -1,6 +1,7 @@
 ﻿using ezFFmpeg.Common;
 using ezFFmpeg.Models.Common;
 using ezFFmpeg.Models.DialogResults;
+using ezFFmpeg.Models.Profiles;
 using ezFFmpeg.Services.Interfaces;
 using ezFFmpeg.Views;
 using Microsoft.WindowsAPICodePack.Dialogs;

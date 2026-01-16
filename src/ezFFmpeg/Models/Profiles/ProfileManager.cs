@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace ezFFmpeg.Models.Common
+namespace ezFFmpeg.Models.Profiles
 {
     /// <summary>
     /// プロファイル管理クラス
@@ -158,6 +158,24 @@ namespace ezFFmpeg.Models.Common
         public Profile? GetLastUsed()
         {
             return Profiles.FirstOrDefault(p => p.IsLastUsed);
+        }
+
+        public Profile? GetPreferredProfile()
+        {
+            // デフォルトを優先
+            var profile = Profiles.FirstOrDefault(p => p.IsDefault);
+            if (profile != null)
+                return profile;
+
+            // デフォルトがなければ最終使用
+            profile = Profiles.FirstOrDefault(p => p.IsLastUsed);
+            if (profile != null)
+                return profile;
+
+            // 最初
+            profile = Profiles.FirstOrDefault();
+
+            return profile;
         }
 
         // ============================

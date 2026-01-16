@@ -1,6 +1,7 @@
 ﻿using ezFFmpeg.Models.Common;
 using ezFFmpeg.Models.Encoder;
 using ezFFmpeg.Models.Presets;
+using ezFFmpeg.Models.Profiles;
 using ezFFmpeg.Models.Quality;
 using System;
 using System.Collections.Generic;

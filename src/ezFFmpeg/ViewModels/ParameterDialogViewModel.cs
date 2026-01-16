@@ -8,6 +8,7 @@ using ezFFmpeg.Models.Interfaces;
 using ezFFmpeg.Models.Media;
 using ezFFmpeg.Models.Output;
 using ezFFmpeg.Models.Presets;
+using ezFFmpeg.Models.Profiles;
 using ezFFmpeg.Models.Quality;
 using ezFFmpeg.Services.Interfaces;
 using ezFFmpeg.Services.Mapping;
@@ -352,7 +353,7 @@ namespace ezFFmpeg.ViewModels
             _dialogService      = dialogService;
             _mode               = mode;
 
-            var format = OutputFormats.GetOutputFormat(_settings.CurrentProfile.OutputFormat);
+            var format = OutputFormats.GetOutputFormat(_settings.CurrentProfile!.OutputFormat);
 
             // コンボボックスのリスト
             ComboBoxHelper.SetFromProfiles(ProfileList, _settings.Profiles);

@@ -1,6 +1,6 @@
 ﻿using ezFFmpeg.Common;
-using ezFFmpeg.Models.Common;
 using ezFFmpeg.Models.Interfaces;
+using ezFFmpeg.Models.Profiles;
 using System;
 using System.Collections.Generic;
 using System.Text;

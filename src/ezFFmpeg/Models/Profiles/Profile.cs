@@ -1,4 +1,5 @@
 ﻿using ezFFmpeg.Common;
+using ezFFmpeg.Models.Common;
 using ezFFmpeg.Models.Encoder;
 using ezFFmpeg.Models.Interfaces;
 using ezFFmpeg.Models.Output;
@@ -14,7 +15,7 @@ using System.Drawing.Printing;
 using System.Runtime;
 using System.Text;
 
-namespace ezFFmpeg.Models.Common
+namespace ezFFmpeg.Models.Profiles
 {
     /// <summary>
     /// 変換プロファイルを表すクラス
@@ -205,8 +206,8 @@ namespace ezFFmpeg.Models.Common
             _videoFrameRate = VideoFrameRates.Source.FrameRate;
 
             _isAudioEnabled = true;
-            _audioEncoder = AudioEncoders.Copy.Encoder;
-            _audioBitRate = AudioBitRates.Source.BitRate;
+            _audioEncoder = AudioEncoders.Aac.Encoder;
+            _audioBitRate = AudioBitRates.Kbps192.BitRate;
 
             _profileName = $"既定({BuildProfileName()})"; 
 
@@ -218,11 +219,12 @@ namespace ezFFmpeg.Models.Common
         /// <summary>
         /// GPU エンコーダを考慮したコンストラクタ
         /// </summary>
-        /// <param name="encoder">使用するビデオエンコーダ</param>
-        public Profile(String encoder)
+        /// <param name="useGpu">Gup使用フラグ</param>
+        public Profile(bool useGpu)
             : this()
         {
-            _videoEncoder = encoder;
+            VideoEncoder = useGpu ? VideoEncoders.GetDefaultGpuEncoderName() :
+                                    VideoEncoders.LibX264.Encoder;
         }
 
         /// <summary>

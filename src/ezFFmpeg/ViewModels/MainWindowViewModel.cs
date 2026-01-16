@@ -4,6 +4,7 @@ using ezFFmpeg.Models.Common;
 using ezFFmpeg.Models.Conversion;
 using ezFFmpeg.Models.Encoder;
 using ezFFmpeg.Models.Output;
+using ezFFmpeg.Models.Profiles;
 using ezFFmpeg.Services.Conversion;
 using ezFFmpeg.Services.FFmpeg;
 using ezFFmpeg.Services.Interfaces;
@@ -15,7 +16,6 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace ezFFmpeg.ViewModels
 {
@@ -435,9 +435,9 @@ namespace ezFFmpeg.ViewModels
         private void UpdateEncoderStatus()
         {
             // ビデオエンコーダの状態更新
-            VideoEncoderStatus = _settings.CurrentProfile.BuildVideoEncoderStstus();
+            VideoEncoderStatus = _settings.CurrentProfile!.BuildVideoEncoderStstus();
             // オーディオエンコーダの状態更新
-            AudioEncoderStatus = _settings.CurrentProfile.BuildAudioEncoderStatus();
+            AudioEncoderStatus = _settings.CurrentProfile!.BuildAudioEncoderStatus();
         }
 
         /// <summary>
@@ -568,7 +568,7 @@ namespace ezFFmpeg.ViewModels
                 if (_settings.IsFFmpegEnableLog)
                 {
                     var logFileName = $"{AppInfo.AppName}_{_settings.ProcessStartTime:yyyyMMdd_HHmmssfff}.log";
-                    var logFilePath = Path.Combine(_settings.CurrentProfile.OutputFolderPath, logFileName);
+                    var logFilePath = Path.Combine(_settings.CurrentProfile!.OutputFolderPath, logFileName);
                     using var sw = new StreamWriter(logFilePath, false, Encoding.UTF8);
 
                     foreach (var item in selectedFiles)
@@ -792,7 +792,7 @@ namespace ezFFmpeg.ViewModels
         {
             return caretIndex switch
             {
-                1 => TimeSpan.FromHours(10 * duration),             // 時間10の位
+                0 or 1 => TimeSpan.FromHours(10 * duration),        // 時間10の位
                 2 or 3 => TimeSpan.FromHours(1 * duration),         // 時間1の位
                 4 => TimeSpan.FromMinutes(10 * duration),           // 分10の位
                 5 or 6 => TimeSpan.FromMinutes(1 * duration),       // 分1の位
