@@ -243,7 +243,6 @@ namespace ezFFmpeg
 
             // 準備完了
             SmoothProgress("準備完了...", 90, 100);
-            _splash.ViewModel.Progress = 100;
             _splash.Close();
         }
 
