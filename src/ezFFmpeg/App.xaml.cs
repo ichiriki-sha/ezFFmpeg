@@ -159,10 +159,15 @@ namespace ezFFmpeg
         }
 
         /// <summary>
-        /// Splash 画面の進捗バーを滑らかに更新する。
+        /// Splash 画面の進捗バーを更新する。
         /// </summary>
-        private void SmoothProgress(string message, int from, int to)
+        private void UpdateSplashProgress(string message, int from, int to)
         {
+            if (_splash == null)
+            {
+                _splash = new SplashWindow();
+                _splash.Show();
+            }
 
             _splash.ViewModel.Message = message;
 
@@ -198,10 +203,7 @@ namespace ezFFmpeg
             // -----------------------------
             // Splash 表示
             // -----------------------------
-            _splash = new SplashWindow();
-            _splash.Show();
-
-            SmoothProgress("起動中...", 0, 10);
+            UpdateSplashProgress("起動中...", 0, 10);
 
             // 描画を即時反映
             await Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Background);
@@ -214,15 +216,15 @@ namespace ezFFmpeg
             {
 
                 // 設定のロード
-                SmoothProgress("設定を読み込み中...", 10, 20);
+                UpdateSplashProgress("設定を読み込み中...", 10, 20);
                 _setting = LoadOrCreateSettings();
 
                 // 作業フォルダを作成
-                SmoothProgress("作業フォルダを作成中...", 20, 30);
+                UpdateSplashProgress("作業フォルダを作成中...", 20, 30);
                 EnsureFolders(_setting);
 
                 // FFmpeg 設定確認
-                SmoothProgress("FFmpeg を確認中...", 30, 40);
+                UpdateSplashProgress("FFmpeg を確認中...", 30, 40);
                 if (!EnsureFFmpegSetting(_setting))
                 {
                     Shutdown();
@@ -230,11 +232,11 @@ namespace ezFFmpeg
                 }
 
                 // FFmpeg / Encoder 初期化
-                SmoothProgress("FFmpeg を初期化中...", 40, 80);
+                UpdateSplashProgress("FFmpeg を初期化中...", 40, 80);
                 InitializeFFmpeg(_setting);
 
                 // プロファイル初期化
-                SmoothProgress("プロファイルを準備中...", 80, 90);
+                UpdateSplashProgress("プロファイルを準備中...", 80, 90);
                 InitializeProfiles(_setting);
             });
 
@@ -242,7 +244,7 @@ namespace ezFFmpeg
             ShowMainWindow(_setting);
 
             // 準備完了
-            SmoothProgress("準備完了...", 90, 100);
+            UpdateSplashProgress("準備完了...", 90, 100);
             _splash.Close();
         }
 
