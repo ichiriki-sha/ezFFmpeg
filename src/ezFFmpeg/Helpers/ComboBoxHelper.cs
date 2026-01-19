@@ -58,7 +58,7 @@ namespace ezFFmpeg.Helpers
                 list.Add(new SelectionItem
                 {
                     Key = Tag,
-                    Name = $"{{{Tag}}} = {{{Name}}}"
+                    Name = $"{{{Tag}}} = {Name}"
                 });
             }
         }
