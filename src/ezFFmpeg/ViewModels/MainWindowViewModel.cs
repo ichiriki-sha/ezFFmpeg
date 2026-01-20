@@ -907,7 +907,7 @@ namespace ezFFmpeg.ViewModels
                 "処理を中断して終了しますか？",
                 "確認",
                 MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+                MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.No)
                 return false;
