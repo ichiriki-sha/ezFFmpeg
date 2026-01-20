@@ -27,6 +27,52 @@
             <c:NullToBoolConverter x:Key="NullToBoolConverter" />
             <c:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
             <c:SliderProgressWidthConverter x:Key="SliderProgressWidthConverter"/>
+
+
+            <!--<Style x:Key="SoftDisabledRepeatButton"
+                   TargetType="RepeatButton"
+                   BasedOn="{StaticResource {x:Type RepeatButton}}">
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.5"/>
+                        <Setter Property="Foreground" Value="#888"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>-->
+
+            <Style x:Key="SoftDisabledRepeatButton"
+                   TargetType="RepeatButton"
+                   BasedOn="{StaticResource {x:Type RepeatButton}}">
+                <Setter Property="BorderThickness" Value="0,1,1,1"/>
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.45"/>
+                        <Setter Property="BorderBrush" Value="#30000000"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="SoftDisabledTextBox"
+                   TargetType="TextBox"
+                   BasedOn="{StaticResource {x:Type TextBox}}">
+                <Setter Property="BorderThickness" Value="1,1,0,1"/>
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.55"/>
+                        <Setter Property="Background" Value="#10FFFFFF"/>
+                        <Setter Property="Foreground" Value="#888"/>
+                        <Setter Property="BorderBrush" Value="#40000000"/>
+                    </Trigger>
+                    <Trigger Property="IsReadOnly" Value="True">
+                        <Setter Property="Background" Value="#EEE"/>
+                        <Setter Property="Foreground" Value="#888"/>
+                        <Setter Property="BorderBrush" Value="#AAA"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+
+
         </ResourceDictionary>
     </Window.Resources>
 
@@ -526,6 +572,7 @@
                                                  Width="72"
                                                  Margin="8 0 0 0" 
                                                  HorizontalAlignment="Right" 
+                                                 Style="{StaticResource SoftDisabledTextBox}"
                                                  Text="{Binding StartPositionText,
                                                         UpdateSourceTrigger=PropertyChanged}"
                                                  IsReadOnly="{Binding DataContext.IsReadOnly,
@@ -533,18 +580,6 @@
                                                  b:TextBoxCaretBehavior.EnableCaretTracking="True"
                                                  b:TextBoxCaretBehavior.CaretTarget="Start"
                                                  b:ListViewAutoSelectBehavior.EnableAutoSelect="True">
-
-                                            <TextBox.Style>
-                                                <Style TargetType="TextBox">
-                                                    <Style.Triggers>
-                                                        <Trigger Property="IsReadOnly" Value="True">
-                                                            <Setter Property="Background" Value="#EEE"/>
-                                                            <Setter Property="Foreground" Value="#888"/>
-                                                            <Setter Property="BorderBrush" Value="#AAA"/>
-                                                        </Trigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBox.Style>
 
                                             <TextBox.InputBindings>
                                                 <KeyBinding Key="Up"
@@ -564,6 +599,7 @@
                                                       Delay="400"
                                                       Interval="100"
                                                       Focusable="False"
+                                                      Style="{StaticResource SoftDisabledRepeatButton}"
                                                       Command="{Binding DataContext.FileItemStartPositionUpCommand, 
                                                                 RelativeSource={RelativeSource AncestorType=ListView}}"
                                                       IsEnabled="{Binding DataContext.IsReadOnly,
@@ -584,6 +620,7 @@
                                                       Delay="400"
                                                       Interval="100"
                                                       Focusable="False"
+                                                      Style="{StaticResource SoftDisabledRepeatButton}"
                                                       Command="{Binding DataContext.FileItemStartPositionDownCommand, 
                                                                 RelativeSource={RelativeSource AncestorType=ListView}}"
                                                       IsEnabled="{Binding DataContext.IsReadOnly,
@@ -611,6 +648,7 @@
                                                  Width="72"
                                                  Margin="4 0 0 0" 
                                                  HorizontalAlignment="Right" 
+                                                 Style="{StaticResource SoftDisabledTextBox}"
                                                  Text="{Binding EndPositionText,
                                                         UpdateSourceTrigger=PropertyChanged}"
                                                  IsReadOnly="{Binding DataContext.IsReadOnly,
@@ -618,18 +656,6 @@
                                                  b:TextBoxCaretBehavior.EnableCaretTracking="True"
                                                  b:TextBoxCaretBehavior.CaretTarget="End"
                                                  b:ListViewAutoSelectBehavior.EnableAutoSelect="True">
-
-                                            <TextBox.Style>
-                                                <Style TargetType="TextBox">
-                                                    <Style.Triggers>
-                                                        <Trigger Property="IsReadOnly" Value="True">
-                                                            <Setter Property="Background" Value="#EEE"/>
-                                                            <Setter Property="Foreground" Value="#888"/>
-                                                            <Setter Property="BorderBrush" Value="#AAA"/>
-                                                        </Trigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBox.Style>
 
                                             <TextBox.InputBindings>
                                                 <KeyBinding Key="Up"
@@ -648,6 +674,7 @@
                                                       Delay="400"
                                                       Interval="100"
                                                       Focusable="False"
+                                                      Style="{StaticResource SoftDisabledRepeatButton}"
                                                       Command="{Binding DataContext.FileItemEndPositionUpCommand, 
                                                                 RelativeSource={RelativeSource AncestorType=ListView}}"
                                                       IsEnabled="{Binding DataContext.IsReadOnly,
@@ -668,6 +695,7 @@
                                                       Delay="400"
                                                       Interval="100"
                                                       Focusable="False"
+                                                      Style="{StaticResource SoftDisabledRepeatButton}"
                                                       Command="{Binding DataContext.FileItemEndPositionDownCommand, 
                                                                 RelativeSource={RelativeSource AncestorType=ListView}}"
                                                       IsEnabled="{Binding DataContext.IsReadOnly,
