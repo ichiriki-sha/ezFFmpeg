@@ -171,7 +171,7 @@
                                     <!-- プロファイル名 -->
                                     <GridViewColumn Header="プロファイル名"
                                                     DisplayMemberBinding="{Binding ProfileName}"
-                                                    Width="250"/>
+                                                    Width="360"/>
                                 </GridView>
                             </ListView.View>
                         </ListView>
