@@ -28,18 +28,6 @@
             <c:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
             <c:SliderProgressWidthConverter x:Key="SliderProgressWidthConverter"/>
 
-
-            <!--<Style x:Key="SoftDisabledRepeatButton"
-                   TargetType="RepeatButton"
-                   BasedOn="{StaticResource {x:Type RepeatButton}}">
-                <Style.Triggers>
-                    <Trigger Property="IsEnabled" Value="False">
-                        <Setter Property="Opacity" Value="0.5"/>
-                        <Setter Property="Foreground" Value="#888"/>
-                    </Trigger>
-                </Style.Triggers>
-            </Style>-->
-
             <Style x:Key="SoftDisabledRepeatButton"
                    TargetType="RepeatButton"
                    BasedOn="{StaticResource {x:Type RepeatButton}}">
@@ -70,8 +58,6 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
-
-
 
         </ResourceDictionary>
     </Window.Resources>
@@ -835,9 +821,15 @@
 
                                 <Separator/>
                                 
-                                <MenuItem Header="開始位置に設定(S_)"
+                                <MenuItem 
+                                    Header="開始位置に設定(S_)"
+                                    IsEnabled="{Binding IsProcessing, 
+                                                Converter={StaticResource InverseBoolConverter}}"
                                     Command="{Binding Preview.SetStartPositionCommand}" />
-                                <MenuItem Header="終了位置に設定(E_)"
+                                <MenuItem 
+                                    Header="終了位置に設定(E_)"
+                                    IsEnabled="{Binding IsProcessing, 
+                                                Converter={StaticResource InverseBoolConverter}}"
                                     Command="{Binding Preview.SetEndPositionCommand}" />
                             </ContextMenu>
                         </Grid.ContextMenu>
