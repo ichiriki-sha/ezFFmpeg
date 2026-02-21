@@ -185,7 +185,7 @@
                             <Button Content="既定(_D)"
                                 Width="70"
                                 Height="20"
-                                IsEnabled="{Binding IsDefualtProfileEnabled}"
+                                IsEnabled="{Binding IsDefaultProfileEnabled}"
                                 Command="{Binding DefaultProfileCommand}"/>
                         </StackPanel>
                         

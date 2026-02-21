@@ -68,13 +68,13 @@ namespace ezFFmpeg.Helpers
         /// 出力フォーマットや GPU 使用可否に応じてフィルタリングを行う。
         /// </summary>
         /// <param name="list">出力先の SelectionItem コレクション</param>
-        /// <param name="defultEncoder">選択すべきデフォルトエンコーダ</param>
+        /// <param name="defaultEncoder">選択すべきデフォルトエンコーダ</param>
         /// <param name="encoders">使用可能なビデオエンコーダ一覧</param>
         /// <param name="format">出力フォーマット</param>
         /// <param name="useGpu">GPU エンコードを使用するかどうか</param>
         public static void SetVideoEncoders(
                                 ObservableCollection<SelectionItem> list,
-                                out string defultEncoder,
+                                out string defaultEncoder,
                                 IEnumerable<VideoEncoder> encoders,
                                 OutputFormat format,
                                 bool useGpu)
@@ -99,7 +99,7 @@ namespace ezFFmpeg.Helpers
             }
 
             // 推奨コーデックがあれば選択状態にする
-            defultEncoder = VideoEncoders.Copy.Encoder;
+            defaultEncoder = VideoEncoders.Copy.Encoder;
             if (format.RecommendedVideo != null)
             {
                 if (useGpu)
@@ -109,20 +109,20 @@ namespace ezFFmpeg.Helpers
                         var encoder = VideoEncoders.GetEncoder(key);
                         if (encoder.UseGpu && encoder.Codec.Codec == format.RecommendedVideo.Codec)
                         {
-                            defultEncoder = encoder.Encoder;
+                            defaultEncoder = encoder.Encoder;
                             break;
                         }
                     }
                 }
 
-                if(defultEncoder == VideoEncoders.Copy.Encoder)
+                if(defaultEncoder == VideoEncoders.Copy.Encoder)
                 {
                     foreach (var key in list.Select(x => x.Key.ToString()!))
                     {
                         var encoder = VideoEncoders.GetEncoder(key);
                         if (!encoder.UseGpu && encoder.Codec.Codec == format.RecommendedVideo.Codec)
                         {
-                            defultEncoder = encoder.Encoder;
+                            defaultEncoder = encoder.Encoder;
                             break;
                         }
                     }
@@ -135,12 +135,12 @@ namespace ezFFmpeg.Helpers
         /// 出力フォーマットに応じてフィルタリングを行う。
         /// </summary>
         /// <param name="list">出力先の SelectionItem コレクション</param>
-        /// <param name="defultEncoder">選択すべきデフォルトエンコーダ</param>
+        /// <param name="defaultEncoder">選択すべきデフォルトエンコーダ</param>
         /// <param name="encoders">使用可能なオーディオエンコーダ一覧</param>
         /// <param name="format">出力フォーマット</param>
         public static void SetAudioEncoders(
                         ObservableCollection<SelectionItem> list,
-                        out string defultEncoder,
+                        out string defaultEncoder,
                         IEnumerable<AudioEncoder> encoders,
                         OutputFormat format)
         {
@@ -164,7 +164,7 @@ namespace ezFFmpeg.Helpers
             }
 
             // 推奨コーデックがあれば選択状態にする
-            defultEncoder = AudioEncoders.Copy.Encoder;
+            defaultEncoder = AudioEncoders.Copy.Encoder;
             if (format.RecommendedAudio != null)
             {
                 foreach (var key in list.Select(x => x.Key.ToString()!))
@@ -172,7 +172,7 @@ namespace ezFFmpeg.Helpers
                     var encoder = AudioEncoders.GetEncoder(key);
                     if (encoder.Codec.Codec == format.RecommendedAudio.Codec)
                     {
-                        defultEncoder = encoder.Encoder;
+                        defaultEncoder = encoder.Encoder;
                         break;
                     }
                 }

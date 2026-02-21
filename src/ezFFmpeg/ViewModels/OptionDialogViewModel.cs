@@ -125,11 +125,11 @@ namespace ezFFmpeg.ViewModels
         }
 
         // プロファイル操作ボタンの有効/無効フラグ
-        private bool _isDefualtProfileEnabled;
-        public bool IsDefualtProfileEnabled 
+        private bool _isDefaultProfileEnabled;
+        public bool IsDefaultProfileEnabled 
         { 
-            get => _isDefualtProfileEnabled; 
-            set => SetProperty(ref _isDefualtProfileEnabled, value); 
+            get => _isDefaultProfileEnabled; 
+            set => SetProperty(ref _isDefaultProfileEnabled, value); 
         }
 
         private bool _isAddProfileEnabled;
@@ -195,7 +195,7 @@ namespace ezFFmpeg.ViewModels
             _dialogService              = dialogService;
 
 
-            _isDefualtProfileEnabled    = false;
+            _isDefaultProfileEnabled    = false;
             _isAddProfileEnabled        = true;
             _isCopyProfileEnabled       = false;
             _isEditProfileEnabled       = false;
@@ -304,7 +304,7 @@ namespace ezFFmpeg.ViewModels
         {
             if (SelectedProfile == null)
             {
-                IsDefualtProfileEnabled = false;
+                IsDefaultProfileEnabled = false;
                 IsAddProfileEnabled     = true;
                 IsCopyProfileEnabled    = false;
                 IsEditProfileEnabled    = false;
@@ -312,7 +312,7 @@ namespace ezFFmpeg.ViewModels
             }
             else
             {
-                IsDefualtProfileEnabled = true;
+                IsDefaultProfileEnabled = true;
                 IsAddProfileEnabled     = true;
                 IsCopyProfileEnabled    = true;
                 IsEditProfileEnabled    = SelectedProfile.IsUserDefined;
