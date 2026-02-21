@@ -64,9 +64,12 @@ Profile クラスは次の役割を担います。
 
 以下のタグを使用できます。
 
-- `{FileName}` : 元ファイル名
-- `{VideoCodec}` : 使用ビデオコーデック
-- `{Extension}` : 拡張子
+- `{filename}` : ファイル名
+- `{vcodec}` : ビデオコーデック
+- `{acodec}` : オーディオコーデック
+- `{quality}` : 品質レベル
+- `{resolution}` : 解像度
+- `{timestamp}` : タイムスタンプ
 
 ---
 
